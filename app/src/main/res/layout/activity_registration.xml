@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    tools:context=".RegistrationActivity">
+
+ <LinearLayout
+     android:id="@+id/main"
+     android:layout_width="match_parent"
+     android:layout_height="wrap_content"
+     android:orientation="vertical"
+     android:fitsSystemWindows="true">
+
+  <!-- Heading -->
+  <!-- Heading -->
+  <TextView
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:text="Sign Up Your Account"
+      android:textColor="@color/black"
+      android:textSize="25sp"
+      android:textStyle="bold"
+      android:gravity="center"
+      android:paddingStart="40dp"
+      android:paddingEnd="40dp"
+      android:layout_marginTop="50dp"/>
+
+  <!-- Full Name -->
+  <EditText
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:hint="Full Name"
+      android:padding="12dp"
+      android:background="@drawable/edttext_border_black"
+      android:layout_marginTop="40dp"
+      android:layout_marginHorizontal="30dp"/>
+
+  <!-- Email -->
+  <EditText
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:hint="Email"
+      android:inputType="textEmailAddress"
+      android:padding="12dp"
+      android:background="@drawable/edttext_border_black"
+      android:layout_marginTop="18dp"
+      android:layout_marginHorizontal="30dp"/>
+
+  <!-- Password -->
+  <EditText
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:hint="Password"
+      android:inputType="textPassword"
+      android:padding="12dp"
+      android:background="@drawable/edttext_border_black"
+      android:layout_marginTop="18dp"
+      android:layout_marginHorizontal="30dp"/>
+
+  <!-- Blood Group -->
+  <EditText
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:hint="Blood Group"
+      android:padding="12dp"
+      android:background="@drawable/edttext_border_black"
+      android:layout_marginTop="18dp"
+      android:layout_marginHorizontal="30dp"/>
+
+  <!-- Country -->
+  <EditText
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:hint="Country"
+      android:padding="12dp"
+      android:background="@drawable/edttext_border_black"
+      android:layout_marginTop="18dp"
+      android:layout_marginHorizontal="30dp"/>
+
+  <!-- Terms and Conditions -->
+  <CheckBox
+      android:id="@+id/checked"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="I agree to the terms and conditions"
+      android:layout_marginTop="12dp"
+      android:layout_marginHorizontal="30dp"/>
+
+  <!-- Sign Up Button -->
+  <Button
+      android:id="@+id/btnsignup"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:text="Sign Up"
+      android:textAllCaps="false"
+      android:textSize="18sp"
+      android:textColor="@android:color/white"
+      app:backgroundTint="#E91E63"
+      app:cornerRadius="10dp"
+      android:layout_marginTop="12dp"
+      android:layout_marginHorizontal="30dp"
+      android:padding="12dp"/>
+
+  <!-- Or Divider -->
+  <TextView
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="Or"
+      android:textSize="16sp"
+      android:layout_gravity="center"
+      android:layout_marginTop="12dp"/>
+
+  <!-- Social Buttons -->
+  <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:orientation="horizontal"
+      android:gravity="center"
+      android:layout_marginTop="12dp">
+
+   <ImageView
+       android:layout_width="50dp"
+       android:layout_height="50dp"
+       android:src="@drawable/google"
+       android:layout_margin="8dp"
+       android:layout_marginEnd="30dp"/>
+
+   <ImageView
+       android:layout_width="50dp"
+       android:layout_height="50dp"
+       android:src="@drawable/facebook"
+       android:layout_margin="8dp"
+       android:layout_marginStart="20dp"/>
+  </LinearLayout>
+
+  <!-- Bottom Sign In -->
+  <LinearLayout
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:orientation="horizontal"
+      android:gravity="center"
+      android:layout_gravity="center"
+      android:layout_marginTop="14dp"
+      android:layout_marginBottom="14dp">
+
+   <TextView
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:text="Already Have An Account ?"
+       android:textSize="14sp"
+       android:textStyle="bold"
+       android:textColor="@color/black"/>
+
+   <TextView
+       android:id="@+id/txtSignIn"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:text=" Sign In"
+       android:textSize="14sp"
+       android:textStyle="bold"
+       android:textColor="#E91E63"
+       android:layout_marginStart="4dp"/>
+  </LinearLayout>
+
+ </LinearLayout>
+</ScrollView>
