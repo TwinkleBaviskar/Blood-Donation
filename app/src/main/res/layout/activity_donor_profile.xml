@@ -91,6 +91,7 @@
             android:gravity="center">
 
             <TextView
+                android:id="@+id/donatedValue"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="05"
@@ -121,6 +122,7 @@
             android:gravity="center">
 
             <TextView
+                android:id="@+id/bloodTypeValue"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="A-"
@@ -150,6 +152,7 @@
             android:gravity="center">
 
             <TextView
+                android:id="@+id/lifeSavedValue"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="06"

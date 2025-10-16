@@ -22,7 +22,7 @@ class FindDonorScreen : AppCompatActivity() {
         backArrow.setOnClickListener {
             val intent = Intent(this, HomeScreenActivity::class.java) // Replace with your home screen
             startActivity(intent)
-            finish() // Optional: close current activity
+            finish()
         }
 
         recyclerView = findViewById(R.id.recyclerDonors)
@@ -31,18 +31,76 @@ class FindDonorScreen : AppCompatActivity() {
 
         donorList = ArrayList()
 
-        // Dummy Data
-        donorList.add(DonorModel("Liam Elijah", "New York", "A+", R.drawable.profile))
-        donorList.add(DonorModel("Oliver James", "Washington, D.C.", "B-", R.drawable.profile))
-        donorList.add(DonorModel("Michel Lucas", "Arizona", "O+", R.drawable.profile))
-        donorList.add(DonorModel("Benjamin Jack", "Florida", "AB-", R.drawable.profile))
-        donorList.add(DonorModel("Archer Noah", "Georgia", "A-", R.drawable.profile))
-        donorList.add(DonorModel("Daniel Henry", "California", "B+", R.drawable.profile))
-        donorList.add(DonorModel("Benjamin Jack", "Florida", "AB-", R.drawable.profile))
-        donorList.add(DonorModel("Archer Noah", "Georgia", "A-", R.drawable.profile))
-        donorList.add(DonorModel("Daniel Henry", "California", "B+", R.drawable.profile))
+        // ✅ Updated Dummy Data with all details
+        donorList.add(
+            DonorModel(
+                name = "Liam Elijah",
+                location = "New York",
+                bloodGroup = "A+",
+                imageRes = R.drawable.profile,
+                lastDonation = "2 months ago",
+                livesSaved = 12,
+                totalDonations = 5
+            )
+        )
+        donorList.add(
+            DonorModel(
+                name = "Oliver James",
+                location = "Washington, D.C.",
+                bloodGroup = "B-",
+                imageRes = R.drawable.profile,
+                lastDonation = "5 months ago",
+                livesSaved = 8,
+                totalDonations = 3
+            )
+        )
+        donorList.add(
+            DonorModel(
+                name = "Michel Lucas",
+                location = "Arizona",
+                bloodGroup = "O+",
+                imageRes = R.drawable.profile,
+                lastDonation = "1 year ago",
+                livesSaved = 15,
+                totalDonations = 7
+            )
+        )
+        donorList.add(
+            DonorModel(
+                name = "Benjamin Jack",
+                location = "Florida",
+                bloodGroup = "AB-",
+                imageRes = R.drawable.profile,
+                lastDonation = "3 weeks ago",
+                livesSaved = 10,
+                totalDonations = 4
+            )
+        )
+        donorList.add(
+            DonorModel(
+                name = "Archer Noah",
+                location = "Georgia",
+                bloodGroup = "A-",
+                imageRes = R.drawable.profile,
+                lastDonation = "6 months ago",
+                livesSaved = 7,
+                totalDonations = 2
+            )
+        )
+        donorList.add(
+            DonorModel(
+                name = "Daniel Henry",
+                location = "California",
+                bloodGroup = "B+",
+                imageRes = R.drawable.profile,
+                lastDonation = "1 month ago",
+                livesSaved = 9,
+                totalDonations = 6
+            )
+        )
 
-        adapter = DonorAdapter(donorList)
+        // ✅ Adapter with context passed
+        adapter = DonorAdapter(this, donorList)
         recyclerView.adapter = adapter
     }
 }

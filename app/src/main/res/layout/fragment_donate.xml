@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#FFFFFF">
+
+    <!-- Top Bar -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="12dp">
+
+        <ImageView
+            android:id="@+id/backArrow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/backarrow" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="Donation Screen"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"/>
+
+    </LinearLayout>
+
+
+    <!-- Horizontal toggle buttons -->
+    <LinearLayout
+        android:id="@+id/filterLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:padding="12dp"
+        android:weightSum="3">
+
+        <Button
+            android:id="@+id/btnAll"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:backgroundTint="#E0E0E0"
+            android:text="All"
+            android:textAllCaps="false"
+            android:textColor="@color/black"
+            android:layout_marginEnd="4dp"
+            android:layout_marginStart="4dp"
+            android:padding="8dp"
+            android:background="@drawable/filter_button_bg" />
+
+        <Button
+            android:id="@+id/btnRecent"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:backgroundTint="#E0E0E0"
+            android:text="Recent"
+            android:textAllCaps="false"
+            android:textColor="@color/black"
+            android:layout_marginEnd="4dp"
+            android:layout_marginStart="4dp"
+            android:padding="8dp"
+            android:background="@drawable/filter_button_bg" />
+
+        <Button
+            android:id="@+id/btnUrgent"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:backgroundTint="#E0E0E0"
+            android:text="Urgent"
+            android:textAllCaps="false"
+            android:textColor="@color/black"
+            android:layout_marginEnd="4dp"
+            android:layout_marginStart="4dp"
+            android:padding="8dp"
+            android:background="@drawable/filter_button_bg" />
+    </LinearLayout>
+
+    <!-- RecyclerView -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerDonors"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="8dp"
+        android:layout_marginTop="4dp"/>
+</LinearLayout>
