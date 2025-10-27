@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
+    android:fitsSystemWindows="true"
     tools:context=".RegistrationActivity">
 
  <LinearLayout
@@ -13,9 +13,8 @@
      android:layout_width="match_parent"
      android:layout_height="wrap_content"
      android:orientation="vertical"
-     android:fitsSystemWindows="true">
+     android:paddingBottom="30dp">
 
-  <!-- Heading -->
   <!-- Heading -->
   <TextView
       android:layout_width="match_parent"
@@ -25,9 +24,8 @@
       android:textSize="25sp"
       android:textStyle="bold"
       android:gravity="center"
-      android:paddingStart="40dp"
-      android:paddingEnd="40dp"
-      android:layout_marginTop="50dp"/>
+      android:paddingHorizontal="40dp"
+      android:layout_marginTop="50dp" />
 
   <!-- Full Name -->
   <EditText
@@ -38,19 +36,35 @@
       android:padding="12dp"
       android:background="@drawable/edttext_border_black"
       android:layout_marginTop="40dp"
-      android:layout_marginHorizontal="30dp"/>
+      android:layout_marginHorizontal="30dp"
+      android:imeOptions="actionNext" />
 
   <!-- Email -->
   <EditText
-      android:layout_width="match_parent"
       android:id="@+id/editEmail"
+      android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:hint="Email"
       android:inputType="textEmailAddress"
       android:padding="12dp"
       android:background="@drawable/edttext_border_black"
       android:layout_marginTop="18dp"
-      android:layout_marginHorizontal="30dp"/>
+      android:layout_marginHorizontal="30dp"
+      android:imeOptions="actionNext" />
+
+  <!-- 📱 Mobile Number -->
+  <EditText
+      android:id="@+id/editMobile"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:hint="Mobile Number"
+      android:inputType="phone"
+      android:maxLength="10"
+      android:padding="12dp"
+      android:background="@drawable/edttext_border_black"
+      android:layout_marginTop="18dp"
+      android:layout_marginHorizontal="30dp"
+      android:imeOptions="actionNext" />
 
   <!-- Password -->
   <EditText
@@ -62,18 +76,20 @@
       android:padding="12dp"
       android:background="@drawable/edttext_border_black"
       android:layout_marginTop="18dp"
-      android:layout_marginHorizontal="30dp"/>
+      android:layout_marginHorizontal="30dp"
+      android:imeOptions="actionNext" />
 
   <!-- Blood Group -->
   <EditText
       android:id="@+id/editBloodGroup"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      android:hint="Blood Group"
+      android:hint="Blood Group (e.g. A+, O-)"
       android:padding="12dp"
       android:background="@drawable/edttext_border_black"
       android:layout_marginTop="18dp"
-      android:layout_marginHorizontal="30dp"/>
+      android:layout_marginHorizontal="30dp"
+      android:imeOptions="actionNext" />
 
   <!-- Country -->
   <EditText
@@ -84,16 +100,57 @@
       android:padding="12dp"
       android:background="@drawable/edttext_border_black"
       android:layout_marginTop="18dp"
-      android:layout_marginHorizontal="30dp"/>
+      android:layout_marginHorizontal="30dp"
+      android:imeOptions="actionNext" />
 
-  <!-- Terms and Conditions -->
+  <!-- Weight -->
+  <EditText
+      android:id="@+id/editWeight"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:hint="Weight (kg)"
+      android:inputType="numberDecimal"
+      android:padding="12dp"
+      android:background="@drawable/edttext_border_black"
+      android:layout_marginTop="18dp"
+      android:layout_marginHorizontal="30dp"
+      android:imeOptions="actionNext" />
+
+  <!-- Hemoglobin -->
+  <EditText
+      android:id="@+id/editHemoglobin"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:hint="Hemoglobin (g/dL)"
+      android:inputType="numberDecimal"
+      android:padding="12dp"
+      android:background="@drawable/edttext_border_black"
+      android:layout_marginTop="18dp"
+      android:layout_marginHorizontal="30dp"
+      android:imeOptions="actionNext" />
+
+  <!-- Last Donation Date -->
+  <EditText
+      android:id="@+id/editLastDonation"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:hint="Last Donation Date"
+      android:focusable="false"
+      android:clickable="true"
+      android:padding="12dp"
+      android:background="@drawable/edttext_border_black"
+      android:layout_marginTop="18dp"
+      android:layout_marginHorizontal="30dp"
+      android:imeOptions="actionDone" />
+
+  <!-- Terms -->
   <CheckBox
       android:id="@+id/checked"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:text="I agree to the terms and conditions"
       android:layout_marginTop="12dp"
-      android:layout_marginHorizontal="30dp"/>
+      android:layout_marginHorizontal="30dp" />
 
   <!-- Sign Up Button -->
   <Button
@@ -108,7 +165,7 @@
       app:cornerRadius="10dp"
       android:layout_marginTop="12dp"
       android:layout_marginHorizontal="30dp"
-      android:padding="12dp"/>
+      android:padding="12dp" />
 
   <!-- Or Divider -->
   <TextView
@@ -117,7 +174,7 @@
       android:text="Or"
       android:textSize="16sp"
       android:layout_gravity="center"
-      android:layout_marginTop="12dp"/>
+      android:layout_marginTop="12dp" />
 
   <!-- Social Buttons -->
   <LinearLayout
@@ -132,14 +189,14 @@
        android:layout_height="50dp"
        android:src="@drawable/google"
        android:layout_margin="8dp"
-       android:layout_marginEnd="30dp"/>
+       android:layout_marginEnd="30dp" />
 
    <ImageView
        android:layout_width="50dp"
        android:layout_height="50dp"
        android:src="@drawable/facebook"
        android:layout_margin="8dp"
-       android:layout_marginStart="20dp"/>
+       android:layout_marginStart="20dp" />
   </LinearLayout>
 
   <!-- Bottom Sign In -->
@@ -158,7 +215,7 @@
        android:text="Already Have An Account ?"
        android:textSize="14sp"
        android:textStyle="bold"
-       android:textColor="@color/black"/>
+       android:textColor="@color/black" />
 
    <TextView
        android:id="@+id/txtSignIn"
@@ -168,7 +225,7 @@
        android:textSize="14sp"
        android:textStyle="bold"
        android:textColor="#E91E63"
-       android:layout_marginStart="4dp"/>
+       android:layout_marginStart="4dp" />
   </LinearLayout>
 
  </LinearLayout>

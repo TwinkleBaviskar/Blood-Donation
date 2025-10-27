@@ -20,6 +20,8 @@ class HomeScreenActivity : AppCompatActivity() {
     private lateinit var imgFindDonor: ImageView
     private lateinit var imgDonate: ImageView
     private lateinit var imgBloodBank: ImageView
+    private lateinit var imgReport: ImageView
+    private lateinit var imgRequest: ImageView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,8 +34,10 @@ class HomeScreenActivity : AppCompatActivity() {
         imgFindDonor = findViewById(R.id.imgFindDonor)
         imgDonate = findViewById(R.id.imgDonate)
         imgBloodBank = findViewById(R.id.imgBloodBank)
+        imgReport = findViewById(R.id.imgReport)
+        imgRequest = findViewById(R.id.imgRequest)
 
-        // 🏠 Home (default)
+        // 🏠 Home
         imgHome.setOnClickListener {
             findViewById<View>(R.id.scroll_content).visibility = View.VISIBLE
             findViewById<View>(R.id.fragment_container).visibility = View.GONE
@@ -59,9 +63,21 @@ class HomeScreenActivity : AppCompatActivity() {
         imgBloodBank.setOnClickListener {
             openFragment(BloodBankFragment())
         }
+
+        // 📊 Report Detail → open ReportActivity
+        imgReport.setOnClickListener {
+            val intent = Intent(this, ReportActivity::class.java)
+            startActivity(intent)
+        }
+
+        // 📩 Request Button → Open RequestActivity
+        imgRequest.setOnClickListener {
+            val intent = Intent(this, RequestActivity::class.java)
+            startActivity(intent)
+        }
+
     }
 
-    // ✅ Common safe fragment switch function
     private fun openFragment(fragment: Fragment) {
         try {
             findViewById<View>(R.id.scroll_content).visibility = View.GONE
@@ -77,7 +93,6 @@ class HomeScreenActivity : AppCompatActivity() {
         }
     }
 
-    // ✅ Back button logic
     override fun onBackPressed() {
         val fragment = supportFragmentManager.findFragmentById(R.id.fragment_container)
         if (fragment != null) {
@@ -89,7 +104,6 @@ class HomeScreenActivity : AppCompatActivity() {
         }
     }
 
-    // 💬 Function to open chat screen from anywhere (MessageList or Donate)
     fun openMessageFragment(donorName: String) {
         try {
             runOnUiThread {

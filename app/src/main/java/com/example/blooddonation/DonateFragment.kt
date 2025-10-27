@@ -74,7 +74,7 @@ class DonateFragment : Fragment() {
     fun showContactDialog(name: String, phone: String) {
         val builder = AlertDialog.Builder(requireContext())
         builder.setTitle("Contact $name")
-        builder.setItems(arrayOf("📞 Call", "💬 Message", "❌ Cancel")) { dialog, which ->
+        builder.setItems(arrayOf("❌ Cancel","💬 Message","📞 Call" )) { dialog, which ->
             when (which) {
                 0 -> {
                     val intent = Intent(Intent.ACTION_DIAL)

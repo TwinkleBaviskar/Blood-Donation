@@ -170,6 +170,7 @@
                     android:layout_margin="8dp">
 
                     <ImageView
+                        android:id="@+id/imgReport"
                         android:layout_width="70dp"
                         android:layout_height="70dp"
                         android:background="@drawable/circle_bg"
@@ -181,7 +182,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="6dp"
-                        android:text="Camps"
+                        android:text="Report Detail"
                         android:textSize="14sp"
                         android:textColor="@color/black" />
                 </LinearLayout>
@@ -197,6 +198,7 @@
                     android:layout_margin="8dp">
 
                     <ImageView
+                        android:id="@+id/imgRequest"
                         android:layout_width="70dp"
                         android:layout_height="70dp"
                         android:background="@drawable/circle_bg"

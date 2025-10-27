@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="#FFF6F8"
+    android:padding="20dp"
+    tools:context=".RequestActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
+
+        <!-- Title -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="🩸 Blood Request Form"
+            android:textColor="#E91E63"
+            android:textSize="26sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_marginBottom="28dp"
+            android:fontFamily="sans-serif-medium" />
+
+        <!-- Patient Name -->
+        <EditText
+            android:id="@+id/editPatientName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Patient Full Name"
+            android:inputType="textPersonName"
+            android:padding="14dp"
+            android:background="@drawable/edttext_border_black"
+            android:layout_marginBottom="18dp" />
+
+        <!-- Blood Group -->
+        <Spinner
+            android:id="@+id/spinnerBloodGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/edttext_border_black"
+            android:layout_marginBottom="18dp" />
+
+        <!-- Urgency -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Urgency Level"
+            android:textColor="#E91E63"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp"
+            android:fontFamily="sans-serif-medium" />
+
+        <RadioGroup
+            android:id="@+id/radioGroupUrgency"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginBottom="18dp">
+
+            <RadioButton
+                android:id="@+id/radioEmergency"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Emergency"
+                android:textColor="#E91E63"
+                android:buttonTint="#E91E63" />
+
+            <RadioButton
+                android:id="@+id/radioNormal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Normal"
+                android:textColor="#E91E63"
+                android:buttonTint="#E91E63"
+                android:layout_marginStart="24dp" />
+        </RadioGroup>
+
+        <!-- Hospital -->
+        <EditText
+            android:id="@+id/editHospital"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Hospital Name / Location"
+            android:inputType="textCapWords"
+            android:padding="14dp"
+            android:background="@drawable/edttext_border_black"
+            android:layout_marginBottom="18dp" />
+
+        <!-- Contact -->
+        <EditText
+            android:id="@+id/editContact"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Contact Number"
+            android:inputType="phone"
+            android:maxLength="10"
+            android:padding="14dp"
+            android:background="@drawable/edttext_border_black"
+            android:layout_marginBottom="18dp" />
+
+        <!-- Message -->
+        <EditText
+            android:id="@+id/editMessage"
+            android:layout_width="match_parent"
+            android:layout_height="120dp"
+            android:hint="Additional Message (optional)"
+            android:gravity="top"
+            android:inputType="textMultiLine"
+            android:padding="14dp"
+            android:background="@drawable/edttext_border_black"
+            android:layout_marginBottom="28dp" />
+
+        <!-- Send Request Button -->
+        <Button
+            android:id="@+id/btnSendRequest"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Send Request"
+            android:textAllCaps="false"
+            android:textSize="18sp"
+            android:textColor="@android:color/white"
+            android:fontFamily="sans-serif-medium"
+            android:paddingVertical="14dp"
+            android:backgroundTint="#E91E63"
+            app:cornerRadius="30dp" />
+
+    </LinearLayout>
+</ScrollView>
