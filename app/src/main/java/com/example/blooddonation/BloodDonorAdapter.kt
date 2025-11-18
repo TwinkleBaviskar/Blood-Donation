@@ -15,11 +15,11 @@ import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.blooddonation.R
 import com.example.blooddonation.model.BloodDonorModel
-import java.util.concurrent.TimeUnit
 
 class BloodDonorAdapter(
     private val context: Context,
-    private var donorList: List<BloodDonorModel>
+    private var donorList: List<BloodDonorModel>,
+    private val onDonateClick: (String) -> Unit
 ) : RecyclerView.Adapter<BloodDonorAdapter.DonorViewHolder>() {
 
     inner class DonorViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -39,26 +39,27 @@ class BloodDonorAdapter(
 
     override fun onBindViewHolder(holder: DonorViewHolder, position: Int) {
         val donor = donorList[position]
+
         holder.name.text = donor.name
         holder.bloodGroup.text = donor.bloodGroup
         holder.location.text = donor.location
         holder.timeAgo.text = donor.timeAgo
 
-        val diff = System.currentTimeMillis() - donor.timestamp
-        val hours = TimeUnit.MILLISECONDS.toHours(diff)
-        val isExpired = hours > 12 || donor.requestStatus == "expired"
+        // Urgent = light-red background
+        holder.card.setCardBackgroundColor(
+            if (donor.isUrgent) Color.parseColor("#FFF1F1") else Color.WHITE
+        )
 
-        if (isExpired) {
-            holder.donateButton.isEnabled = false
+        // Button behavior
+        if (donor.requestStatus.equals("completed", ignoreCase = true)) {
             holder.donateButton.text = "Completed"
-            holder.donateButton.setBackgroundColor(Color.parseColor("#BDBDBD")) // grey
-            holder.donateButton.setOnClickListener {
-                Toast.makeText(context, "❌ Donor ko blood mil gaya hai", Toast.LENGTH_SHORT).show()
-            }
+            holder.donateButton.isEnabled = false
+            holder.donateButton.setBackgroundColor(Color.parseColor("#BDBDBD"))
+            holder.donateButton.setOnClickListener(null)
         } else {
-            holder.donateButton.isEnabled = true
             holder.donateButton.text = "Donate"
-            holder.donateButton.setBackgroundColor(Color.parseColor("#F44336")) // red
+            holder.donateButton.isEnabled = true
+            holder.donateButton.setBackgroundColor(Color.parseColor("#F44336"))
 
             holder.donateButton.setOnClickListener {
                 showContactDialog(donor)
@@ -66,35 +67,36 @@ class BloodDonorAdapter(
         }
     }
 
-    // ✅ Updated function (fixed + fully working)
     private fun showContactDialog(donor: BloodDonorModel) {
         val builder = AlertDialog.Builder(context)
         builder.setTitle("Contact ${donor.name}")
-        builder.setMessage("Choose an option to contact:")
+        builder.setMessage("Choose how you want to contact:")
 
+        // Call
         builder.setPositiveButton("📞 Call") { _, _ ->
-            val intent = Intent(Intent.ACTION_DIAL)
-            intent.data = Uri.parse("tel:${donor.phone}")
+            val intent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:${donor.phone}"))
             context.startActivity(intent)
+            // invoke callback to mark completed (as you used previously)
+            onDonateClick(donor.requestId)
         }
 
+        // Message
         builder.setNegativeButton("💬 Message") { _, _ ->
-            // ✅ Open message fragment using HomeScreenActivity function
             Toast.makeText(context, "Opening chat with ${donor.name}", Toast.LENGTH_SHORT).show()
-            if (context is com.example.blooddonation.HomeScreenActivity) {
-                (context as com.example.blooddonation.HomeScreenActivity)
-                    .openMessageFragment(donor.name)
-            } else {
-                Toast.makeText(context, "Unable to open chat screen", Toast.LENGTH_SHORT).show()
-            }
+            onDonateClick(donor.requestId)
         }
 
-        builder.setNeutralButton("Cancel") { dialog, _ -> dialog.dismiss() }
+        // Cancel
+        builder.setNeutralButton("Cancel") { dialog, _ ->
+            dialog.dismiss()
+        }
+
         builder.show()
     }
 
     override fun getItemCount(): Int = donorList.size
 
+    // Now updateList simply replaces list (no forced sorting here)
     fun updateList(newList: List<BloodDonorModel>) {
         donorList = newList
         notifyDataSetChanged()

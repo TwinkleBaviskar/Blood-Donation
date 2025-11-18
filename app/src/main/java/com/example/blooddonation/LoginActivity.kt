@@ -7,10 +7,12 @@ import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import com.example.blooddonation.databinding.ActivityLoginBinding
+import com.google.firebase.auth.FirebaseAuth
 
 class LoginActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityLoginBinding
+    private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -18,7 +20,9 @@ class LoginActivity : AppCompatActivity() {
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // ✅ Login Button (simple local check)
+        auth = FirebaseAuth.getInstance()
+
+        // 🔹 Login Button
         binding.btnSignIn.setOnClickListener {
             val email = binding.editTextEmail.text.toString().trim()
             val password = binding.editTextPassword.text.toString().trim()
@@ -32,11 +36,16 @@ class LoginActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            // 🔹 Fake local login success
-            Toast.makeText(this, "Login successful 🎉", Toast.LENGTH_SHORT).show()
-            val intent = Intent(this, HomeScreenActivity::class.java)
-            startActivity(intent)
-            finish()
+            auth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        Toast.makeText(this, "Login Successful 🎉", Toast.LENGTH_SHORT).show()
+                        startActivity(Intent(this, HomeScreenActivity::class.java))
+                        finish()
+                    } else {
+                        Toast.makeText(this, "Login Failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
+                    }
+                }
         }
 
         // 🔹 Go to Sign Up

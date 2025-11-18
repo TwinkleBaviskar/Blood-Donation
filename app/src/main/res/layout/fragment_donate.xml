@@ -47,42 +47,39 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:backgroundTint="#E0E0E0"
+            android:backgroundTint="#E91E63"
             android:text="All"
             android:textAllCaps="false"
-            android:textColor="@color/black"
+            android:textColor="@color/white"
             android:layout_marginEnd="4dp"
             android:layout_marginStart="4dp"
-            android:padding="8dp"
-            android:background="@drawable/filter_button_bg" />
+            android:padding="8dp"/>
 
         <Button
             android:id="@+id/btnRecent"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:backgroundTint="#E0E0E0"
+            android:backgroundTint="#E91E63"
             android:text="Recent"
             android:textAllCaps="false"
-            android:textColor="@color/black"
+            android:textColor="@color/white"
             android:layout_marginEnd="4dp"
             android:layout_marginStart="4dp"
-            android:padding="8dp"
-            android:background="@drawable/filter_button_bg" />
+            android:padding="8dp"/>
 
         <Button
             android:id="@+id/btnUrgent"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:backgroundTint="#E0E0E0"
+            android:backgroundTint="#E91E63"
             android:text="Urgent"
             android:textAllCaps="false"
-            android:textColor="@color/black"
+            android:textColor="@color/white"
             android:layout_marginEnd="4dp"
             android:layout_marginStart="4dp"
-            android:padding="8dp"
-            android:background="@drawable/filter_button_bg" />
+            android:padding="8dp"/>
     </LinearLayout>
 
     <!-- RecyclerView -->

@@ -8,5 +8,6 @@ data class BloodDonorModel(
     val isUrgent: Boolean = false,
     val timestamp: Long = System.currentTimeMillis(),
     val requestStatus: String = "active",
-    val phone: String = ""
+    val phone: String = "",
+    val requestId: String = ""
 )

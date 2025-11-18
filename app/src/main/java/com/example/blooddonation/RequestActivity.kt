@@ -4,6 +4,10 @@ import android.app.AlertDialog
 import android.os.Bundle
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
+import java.text.SimpleDateFormat
+import java.util.*
 
 class RequestActivity : AppCompatActivity() {
 
@@ -15,6 +19,10 @@ class RequestActivity : AppCompatActivity() {
     private lateinit var editMessage: EditText
     private lateinit var btnSendRequest: Button
 
+    // 🔥 Firebase
+    private lateinit var auth: FirebaseAuth
+    private lateinit var database: FirebaseDatabase
+
     private val bloodGroups = arrayOf(
         "Select Blood Group", "A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"
     )
@@ -23,7 +31,11 @@ class RequestActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_request)
 
-        // Initialize all views
+        // 🩸 Firebase Init
+        auth = FirebaseAuth.getInstance()
+        database = FirebaseDatabase.getInstance("https://blooddonation-bbec8-default-rtdb.asia-southeast1.firebasedatabase.app/")
+
+        // 🧩 Initialize all views
         editPatientName = findViewById(R.id.editPatientName)
         spinnerBloodGroup = findViewById(R.id.spinnerBloodGroup)
         radioGroupUrgency = findViewById(R.id.radioGroupUrgency)
@@ -32,11 +44,11 @@ class RequestActivity : AppCompatActivity() {
         editMessage = findViewById(R.id.editMessage)
         btnSendRequest = findViewById(R.id.btnSendRequest)
 
-        // Setup Spinner
+        // 🔽 Setup BloodGroup Spinner
         val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, bloodGroups)
         spinnerBloodGroup.adapter = adapter
 
-        // Button click listener
+        // 🚀 Send Request Button
         btnSendRequest.setOnClickListener {
             validateAndSend()
         }
@@ -49,22 +61,56 @@ class RequestActivity : AppCompatActivity() {
         val contact = editContact.text.toString().trim()
         val message = editMessage.text.toString().trim()
 
-        // Urgency selection
         val selectedUrgencyId = radioGroupUrgency.checkedRadioButtonId
         val urgency = if (selectedUrgencyId != -1)
             findViewById<RadioButton>(selectedUrgencyId).text.toString()
         else
             ""
 
-        // Validation checks
         when {
             name.isEmpty() -> editPatientName.error = "Enter patient name"
             group == "Select Blood Group" -> showToast("Please select blood group")
             urgency.isEmpty() -> showToast("Please select urgency level")
             hospital.isEmpty() -> editHospital.error = "Enter hospital name"
             contact.length != 10 -> editContact.error = "Enter valid 10-digit contact number"
-            else -> showSuccessDialog(name, group, urgency, hospital, contact, message)
+            else -> saveRequestToFirebase(name, group, urgency, hospital, contact, message)
         }
+    }
+
+    private fun saveRequestToFirebase(
+        name: String,
+        group: String,
+        urgency: String,
+        hospital: String,
+        contact: String,
+        message: String
+    ) {
+        val userId = auth.currentUser?.uid ?: "UnknownUser"
+        val requestId = database.reference.push().key ?: UUID.randomUUID().toString()
+
+        val timestamp = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
+
+        val requestMap = mapOf(
+            "requestId" to requestId,
+            "userId" to userId,
+            "patientName" to name,
+            "bloodGroup" to group,
+            "urgency" to urgency,
+            "hospital" to hospital,
+            "contact" to contact,
+            "message" to message,
+            "timestamp" to timestamp
+        )
+
+        val requestRef = database.getReference("requests").child(requestId)
+
+        requestRef.setValue(requestMap)
+            .addOnSuccessListener {
+                showSuccessDialog(name, group, urgency, hospital, contact, message)
+            }
+            .addOnFailureListener {
+                showToast("Failed to send request: ${it.message}")
+            }
     }
 
     private fun showSuccessDialog(

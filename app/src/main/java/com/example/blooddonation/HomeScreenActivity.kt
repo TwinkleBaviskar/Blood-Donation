@@ -22,6 +22,7 @@ class HomeScreenActivity : AppCompatActivity() {
     private lateinit var imgBloodBank: ImageView
     private lateinit var imgReport: ImageView
     private lateinit var imgRequest: ImageView
+    private lateinit var imgProfile: ImageView // 👤 Profile icon
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,6 +37,7 @@ class HomeScreenActivity : AppCompatActivity() {
         imgBloodBank = findViewById(R.id.imgBloodBank)
         imgReport = findViewById(R.id.imgReport)
         imgRequest = findViewById(R.id.imgRequest)
+        imgProfile = findViewById(R.id.imgProfile)
 
         // 🏠 Home
         imgHome.setOnClickListener {
@@ -76,6 +78,11 @@ class HomeScreenActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        // 👤 Profile → Open ProfileScreenActivity
+        imgProfile.setOnClickListener {
+            val intent = Intent(this, ProfileScreenActivity::class.java)
+            startActivity(intent)
+        }
     }
 
     private fun openFragment(fragment: Fragment) {
