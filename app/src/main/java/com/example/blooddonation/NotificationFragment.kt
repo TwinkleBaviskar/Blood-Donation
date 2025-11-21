@@ -1,0 +1,78 @@
+package com.example.blooddonation.fragment
+
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.blooddonation.adapter.NotificationAdapter
+import com.example.blooddonation.databinding.FragmentNotificationBinding
+import com.example.blooddonation.model.NotificationModel
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.*
+
+class NotificationFragment : Fragment() {
+
+    private lateinit var binding: FragmentNotificationBinding
+
+    private lateinit var db: FirebaseDatabase
+    private lateinit var auth: FirebaseAuth
+    private lateinit var notiRef: DatabaseReference
+
+    private val notificationList = ArrayList<NotificationModel>()
+    private lateinit var adapter: NotificationAdapter
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        binding = FragmentNotificationBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        auth = FirebaseAuth.getInstance()
+        val currentUser = auth.currentUser ?: return  // safety
+
+        db = FirebaseDatabase.getInstance(
+            "https://blooddonation-bbec8-default-rtdb.asia-southeast1.firebasedatabase.app/"
+        )
+        notiRef = db.getReference("notifications").child(currentUser.uid)
+
+        binding.recyclerNotifications.layoutManager = LinearLayoutManager(requireContext())
+
+        adapter = NotificationAdapter(notificationList)
+        binding.recyclerNotifications.adapter = adapter
+
+        loadNotifications()
+    }
+
+    private fun loadNotifications() {
+        notiRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                notificationList.clear()
+
+                for (snap in snapshot.children) {
+                    val model = snap.getValue(NotificationModel::class.java)
+                    if (model != null) notificationList.add(model)
+                }
+
+                // newest first
+                notificationList.sortByDescending { it.timestamp }
+
+                adapter.notifyDataSetChanged()
+
+                // empty state
+                binding.txtEmpty.visibility =
+                    if (notificationList.isEmpty()) View.VISIBLE else View.GONE
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                // ignore for now
+            }
+        })
+    }
+}

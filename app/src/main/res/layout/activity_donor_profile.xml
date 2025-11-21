@@ -175,12 +175,17 @@
     <FrameLayout
         android:id="@+id/mapContainer"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_above="@id/buttonContainer"
+        android:layout_height="300dp"
         android:layout_below="@id/statsContainer"
+        android:layout_above="@id/buttonContainer"
         android:layout_marginTop="16dp"
-        android:layout_marginBottom="16dp"
-        android:background="#E0E0E0" />
+        android:layout_marginBottom="16dp">
+
+        <org.osmdroid.views.MapView
+            android:id="@+id/osmDonorMap"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </FrameLayout>
 
     <!-- Bottom Buttons (stuck to bottom) -->
     <LinearLayout

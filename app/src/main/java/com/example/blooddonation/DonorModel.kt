@@ -13,5 +13,7 @@ data class DonorModel(
     val lastDonation: String? = null,
     val livesSaved: Int? = 0,
     val totalDonations: Int? = 0,
-    val profileImage: String? = null
+    val profileImage: String? = null,
+    val latitude: Double? = null,
+    val longitude: Double? = null
 ) : Serializable

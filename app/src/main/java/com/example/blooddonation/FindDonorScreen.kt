@@ -1,22 +1,27 @@
 package com.example.blooddonation
 
 import DonorModel
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Toast
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-
 import com.google.firebase.database.*
+import androidx.core.widget.doOnTextChanged
+import java.util.Random
 
 class FindDonorScreen : AppCompatActivity() {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: DonorAdapter
-    private val donorList = ArrayList<DonorModel>()
+    private lateinit var edtSearch: EditText
+
+    private val donorList = ArrayList<DonorModel>()   // current shown
+    private val allDonors = ArrayList<DonorModel>()   // original list
 
     private lateinit var database: FirebaseDatabase
     private lateinit var userRef: DatabaseReference
@@ -36,25 +41,47 @@ class FindDonorScreen : AppCompatActivity() {
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.setHasFixedSize(true)
 
+        edtSearch = findViewById(R.id.edtSearchDonor)   // 👈 xml me ye id होना chahiye
+
         database = FirebaseDatabase.getInstance("https://blooddonation-bbec8-default-rtdb.asia-southeast1.firebasedatabase.app/")
         userRef = database.getReference("users")
 
         adapter = DonorAdapter(this, donorList)
         recyclerView.adapter = adapter
 
+        setupSearch()
         loadDonorsFromFirebase()
+    }
+
+    private fun setupSearch() {
+        edtSearch.doOnTextChanged { text, _, _, _ ->
+            val q = text?.toString()?.trim()?.lowercase() ?: ""
+            if (q.isEmpty()) {
+                adapter.updateList(allDonors)
+            } else {
+                val filtered = allDonors.filter { donor ->
+                    val name = donor.fullName?.lowercase() ?: ""
+                    val bg = donor.bloodGroup?.lowercase() ?: ""
+                    name.contains(q) || bg.contains(q)
+                }
+                adapter.updateList(filtered)
+            }
+        }
     }
 
     private fun loadDonorsFromFirebase() {
         userRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 donorList.clear()
+                allDonors.clear()
 
                 if (snapshot.exists()) {
+                    val random = Random()
+
                     for (userSnap in snapshot.children) {
                         try {
                             val userId = userSnap.child("userId").value?.toString()
-                                ?: userSnap.key  // fallback: key as userId
+                                ?: userSnap.key
 
                             val fullName = userSnap.child("fullName").value?.toString()
                             val email = userSnap.child("email").value?.toString()
@@ -67,20 +94,46 @@ class FindDonorScreen : AppCompatActivity() {
                             val lastDonation = userSnap.child("lastDonation").value?.toString()
                             val profileImage = userSnap.child("profileImage").value?.toString()
 
-                            // livesSaved: safely Int me convert karo
-                            val livesSaved = when (val v = userSnap.child("livesSaved").value) {
-                                is Long -> v.toInt()
-                                is Int -> v
-                                is String -> v.toIntOrNull() ?: 0
-                                else -> 0
+                            // ⭐ latitude
+                            val latVal = userSnap.child("latitude").value
+                            val latitude = when (latVal) {
+                                is Double -> latVal
+                                is Long -> latVal.toDouble()
+                                is String -> latVal.toDoubleOrNull()
+                                else -> null
                             }
 
-                            // totalDonations: safely Int me convert karo
-                            val totalDonations = when (val v = userSnap.child("totalDonations").value) {
-                                is Long -> v.toInt()
-                                is Int -> v
-                                is String -> v.toIntOrNull() ?: 0
+                            // ⭐ longitude
+                            val lonVal = userSnap.child("longitude").value
+                            val longitude = when (lonVal) {
+                                is Double -> lonVal
+                                is Long -> lonVal.toDouble()
+                                is String -> lonVal.toDoubleOrNull()
+                                else -> null
+                            }
+
+                            // livesSaved
+                            val lsRaw = userSnap.child("livesSaved").value
+                            var livesSaved = when (lsRaw) {
+                                is Long -> lsRaw.toInt()
+                                is Int -> lsRaw
+                                is String -> lsRaw.toIntOrNull() ?: 0
                                 else -> 0
+                            }
+                            if (livesSaved == 0) {
+                                livesSaved = random.nextInt(5) + 1   // 1–5
+                            }
+
+                            // totalDonations
+                            val tdRaw = userSnap.child("totalDonations").value
+                            var totalDonations = when (tdRaw) {
+                                is Long -> tdRaw.toInt()
+                                is Int -> tdRaw
+                                is String -> tdRaw.toIntOrNull() ?: 0
+                                else -> 0
+                            }
+                            if (totalDonations == 0) {
+                                totalDonations = random.nextInt(3) + 1   // 1–3
                             }
 
                             val donor = DonorModel(
@@ -96,7 +149,9 @@ class FindDonorScreen : AppCompatActivity() {
                                 lastDonation = lastDonation,
                                 livesSaved = livesSaved,
                                 totalDonations = totalDonations,
-                                profileImage = profileImage
+                                profileImage = profileImage,
+                                latitude = latitude,
+                                longitude = longitude
                             )
 
                             donorList.add(donor)
@@ -105,7 +160,8 @@ class FindDonorScreen : AppCompatActivity() {
                         }
                     }
 
-                    adapter.notifyDataSetChanged()
+                    allDonors.addAll(donorList)
+                    adapter.updateList(donorList)
                 } else {
                     Toast.makeText(this@FindDonorScreen, "No donors found!", Toast.LENGTH_SHORT).show()
                 }

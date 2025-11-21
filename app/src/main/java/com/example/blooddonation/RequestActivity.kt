@@ -5,6 +5,7 @@ import android.content.Context
 import android.os.Bundle
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import com.example.blooddonation.model.NotificationModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import java.text.SimpleDateFormat
@@ -33,8 +34,10 @@ class RequestActivity : AppCompatActivity() {
         setContentView(R.layout.activity_request)
 
         // 🩸 Firebase Init
+        database = FirebaseDatabase.getInstance(
+            "https://blooddonation-bbec8-default-rtdb.asia-southeast1.firebasedatabase.app/"
+        )
         auth = FirebaseAuth.getInstance()
-        database = FirebaseDatabase.getInstance("https://blooddonation-bbec8-default-rtdb.asia-southeast1.firebasedatabase.app/")
 
         // 🧩 Initialize all views
         editPatientName = findViewById(R.id.editPatientName)
@@ -89,7 +92,9 @@ class RequestActivity : AppCompatActivity() {
         val userId = auth.currentUser?.uid ?: "UnknownUser"
         val requestId = database.reference.push().key ?: UUID.randomUUID().toString()
 
-        val timestamp = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
+        val timestampLong = System.currentTimeMillis()
+        val timestamp = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+            .format(Date(timestampLong))
 
         // ✅ REQUESTER KA NAAM fetch karo
         val requesterName = getRequesterName()
@@ -98,7 +103,7 @@ class RequestActivity : AppCompatActivity() {
             "requestId" to requestId,
             "userId" to userId,
             "patientName" to name,              // Patient ka naam
-            "requesterName" to requesterName,   // ✅ Request bhejne wale ka naam (NAYA)
+            "requesterName" to requesterName,   // Request bhejne wale ka naam
             "bloodGroup" to group,
             "urgency" to urgency,
             "hospital" to hospital,
@@ -111,6 +116,13 @@ class RequestActivity : AppCompatActivity() {
 
         requestRef.setValue(requestMap)
             .addOnSuccessListener {
+                // ✅ sabhi dusre users ko notification bhejo
+                sendNotificationToAll(
+                    title = "New Blood Request",
+                    message = "$name needs $group blood at $hospital",
+                    ts = timestampLong
+                )
+
                 showSuccessDialog(name, group, urgency, hospital, contact, message)
             }
             .addOnFailureListener {
@@ -118,7 +130,36 @@ class RequestActivity : AppCompatActivity() {
             }
     }
 
-    // ✅ NAYA FUNCTION - Current logged-in user ka naam nikalo
+    // ✅ Sabhi users ko notification bhejne ka function
+    private fun sendNotificationToAll(title: String, message: String, ts: Long) {
+        val usersRef = database.getReference("users")
+        val notiRoot = database.getReference("notifications")
+
+        val currentUid = auth.currentUser?.uid ?: return
+
+        usersRef.get().addOnSuccessListener { snapshot ->
+            for (userSnap in snapshot.children) {
+                val uid = userSnap.child("userId").getValue(String::class.java)
+                    ?: userSnap.key ?: continue
+
+                // Apne aap ko skip karo
+                if (uid == currentUid) continue
+
+                val notiId = notiRoot.push().key ?: continue
+
+                val noti = NotificationModel(
+                    notificationId = notiId,
+                    title = title,
+                    message = message,
+                    timestamp = ts
+                )
+
+                notiRoot.child(uid).child(notiId).setValue(noti)
+            }
+        }
+    }
+
+    // ✅ Current logged-in user ka naam nikalo
     private fun getRequesterName(): String {
         // Option 1: Firebase Auth se display name
         val displayName = auth.currentUser?.displayName

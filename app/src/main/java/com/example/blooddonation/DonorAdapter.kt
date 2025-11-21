@@ -16,7 +16,8 @@ import java.util.concurrent.TimeUnit
 
 class DonorAdapter(
     private val context: Context,
-    private val donorList: List<DonorModel>
+    // 🔁 pehle val tha, ab var kiya hai taa ki list update ho sake
+    private var donorList: List<DonorModel>
 ) : RecyclerView.Adapter<DonorAdapter.DonorViewHolder>() {
 
     class DonorViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -61,6 +62,12 @@ class DonorAdapter(
     }
 
     override fun getItemCount(): Int = donorList.size
+
+    // ⭐ yeh naya function hai – search ke time pe list update karne ke liye
+    fun updateList(newList: List<DonorModel>) {
+        donorList = newList
+        notifyDataSetChanged()
+    }
 
     private fun calculateTimeAgo(dateString: String?): String {
         if (dateString.isNullOrEmpty() || dateString == "-") return "-"

@@ -57,10 +57,10 @@
                 app:cardCornerRadius="16dp"
                 app:cardElevation="4dp">
 
-                <ImageView
+                <org.osmdroid.views.MapView
+                    android:id="@+id/osmMap"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:scaleType="centerCrop" />
+                    android:layout_height="match_parent" />
             </androidx.cardview.widget.CardView>
 
             <!-- Features Grid -->
