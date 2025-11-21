@@ -1,7 +1,9 @@
 package com.example.blooddonation.model
 
 data class MessageListModel(
-    val name: String,
-    val lastMessage: String,
-    val time: String
+    var userId: String = "",
+    var name: String = "",
+    var lastMessage: String = "",
+    var lastTimestamp: Long = 0L,
+    var unreadCount: Int = 0
 )

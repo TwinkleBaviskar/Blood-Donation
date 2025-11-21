@@ -1,5 +1,6 @@
 package com.example.blooddonation
 
+import DonorModel
 import android.content.Context
 import android.content.Intent
 import android.view.LayoutInflater
@@ -28,23 +29,21 @@ class DonorAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DonorViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_donor, parent, false)
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.item_donor, parent, false)
         return DonorViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: DonorViewHolder, position: Int) {
         val donor = donorList[position]
 
-        // 🩸 Correct Firebase mapping
         holder.donorName.text = donor.fullName ?: "Unknown"
         holder.donorLocation.text = donor.mobile ?: "No Contact"
         holder.donorBlood.text = donor.bloodGroup ?: "-"
         holder.donorLivesSaved.text = "Lives Saved: ${donor.livesSaved ?: 0}"
 
-        // 🕒 Calculate last donation duration dynamically
         holder.donorLastDonation.text = "Last Donation: ${calculateTimeAgo(donor.lastDonation)}"
 
-        // 👤 Profile image (placeholder if null)
         if (!donor.profileImage.isNullOrEmpty()) {
             Glide.with(context)
                 .load(donor.profileImage)
@@ -54,7 +53,6 @@ class DonorAdapter(
             holder.donorImage.setImageResource(R.drawable.profile)
         }
 
-        // 🔗 Click → open DonorProfileActivity
         holder.itemView.setOnClickListener {
             val intent = Intent(context, DonorProfileActivity::class.java)
             intent.putExtra("donorData", donor)
@@ -64,7 +62,6 @@ class DonorAdapter(
 
     override fun getItemCount(): Int = donorList.size
 
-    // 🧠 Utility: Convert date to "x days/months ago"
     private fun calculateTimeAgo(dateString: String?): String {
         if (dateString.isNullOrEmpty() || dateString == "-") return "-"
 

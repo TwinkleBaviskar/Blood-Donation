@@ -9,10 +9,24 @@ import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.blooddonation.R
 import com.example.blooddonation.model.ReportModel
+import java.text.ParseException
+import java.text.SimpleDateFormat
+import java.util.*
 
 class ReportAdapter(
     private var reportList: ArrayList<ReportModel>
 ) : RecyclerView.Adapter<ReportAdapter.ReportViewHolder>() {
+
+    // Dono jagah (Last Donation + Next Eligible) me yehi format dikhayenge
+    // Example: 17 Sep 2025
+    private val displayFormat = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
+
+    // Firebase me jo format stored hai:
+    // 17/9/2025  -> "d/M/yyyy"
+    private val inputFormats = listOf(
+        SimpleDateFormat("d/M/yyyy", Locale.getDefault()),   // 17/9/2025
+        SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())  // 17/09/2025 (just in case)
+    )
 
     inner class ReportViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val cardReport: CardView = view.findViewById(R.id.cardReport)
@@ -26,21 +40,62 @@ class ReportAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ReportViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.report_item, parent, false)
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.report_item, parent, false)
         return ReportViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: ReportViewHolder, position: Int) {
         val report = reportList[position]
 
-        holder.tvName.text = "👤 ${report.name}"
-        holder.tvBloodGroup.text = "🩸 Blood Group: ${report.bloodGroup}"
-        holder.tvWeight.text = "⚖️ Weight: ${report.weight}"
-        holder.tvLastDonation.text = "🗓️ Last Donation: ${report.lastDonation}"
-        holder.tvNextDonation.text = "📆 Next Eligible: ${report.nextDonation}"
-        holder.tvHemoglobin.text = "💉 Hemoglobin: ${report.hemoglobin}"
+        holder.tvName.text = "👤 ${report.name ?: "-"}"
+        holder.tvBloodGroup.text = "🩸 Blood Group: ${report.bloodGroup ?: "-"}"
+        holder.tvWeight.text = "⚖️ Weight: ${report.weight ?: "-"}"
 
-        if (report.eligibility == "Eligible") {
+        // 🔹 Last Donation ko bhi pretty format me dikhaya
+        holder.tvLastDonation.text =
+            "🗓️ Last Donation: ${formatDisplayDate(report.lastDonation)}"
+
+        holder.tvHemoglobin.text = "💉 Hemoglobin: ${report.hemoglobin ?: "-"}"
+
+        // 🔹 Eligibility + Next Eligible date handle
+        setupEligibilityAndNextDate(holder, report.lastDonation)
+    }
+
+    private fun setupEligibilityAndNextDate(holder: ReportViewHolder, lastDonationStr: String?) {
+        if (lastDonationStr.isNullOrEmpty()) {
+            holder.tvNextDonation.text = "📆 Next Eligible: -"
+            holder.tvEligibility.text = "❓ Not enough data"
+            holder.tvEligibility.setTextColor(Color.parseColor("#616161"))
+            holder.cardReport.setCardBackgroundColor(Color.parseColor("#FFFFFF"))
+            return
+        }
+
+        val lastDonationDate = parseFlexibleDate(lastDonationStr.trim())
+
+        if (lastDonationDate == null) {
+            holder.tvNextDonation.text = "📆 Next Eligible: -"
+            holder.tvEligibility.text = "❓ Invalid date"
+            holder.tvEligibility.setTextColor(Color.parseColor("#616161"))
+            holder.cardReport.setCardBackgroundColor(Color.parseColor("#FFFFFF"))
+            return
+        }
+
+        val cal = Calendar.getInstance()
+        cal.time = lastDonationDate
+
+        // 👉 Rule: 3 months ke baad eligible
+        cal.add(Calendar.MONTH, 3)
+        val nextEligibleDate = cal.time
+
+        val today = Date()
+        val isEligible = !nextEligibleDate.after(today)
+
+        // Next Eligible bhi same display format me
+        holder.tvNextDonation.text =
+            "📆 Next Eligible: ${displayFormat.format(nextEligibleDate)}"
+
+        if (isEligible) {
             holder.tvEligibility.text = "✅ Eligible to Donate"
             holder.tvEligibility.setTextColor(Color.parseColor("#2E7D32"))
             holder.cardReport.setCardBackgroundColor(Color.parseColor("#E8F5E9"))
@@ -49,6 +104,25 @@ class ReportAdapter(
             holder.tvEligibility.setTextColor(Color.parseColor("#C62828"))
             holder.cardReport.setCardBackgroundColor(Color.parseColor("#FFEBEE"))
         }
+    }
+
+    // 🔧 Firebase ke raw string (17/9/2025) ko Date me convert karega
+    private fun parseFlexibleDate(dateStr: String): Date? {
+        for (format in inputFormats) {
+            try {
+                return format.parse(dateStr)
+            } catch (_: ParseException) {
+            }
+        }
+        return null
+    }
+
+    // 🔧 Last Donation ko bhi Next Eligible jaisa format banane ke liye
+    private fun formatDisplayDate(dateStr: String?): String {
+        if (dateStr.isNullOrEmpty()) return "-"
+
+        val parsed = parseFlexibleDate(dateStr.trim()) ?: return dateStr
+        return displayFormat.format(parsed)
     }
 
     override fun getItemCount(): Int = reportList.size

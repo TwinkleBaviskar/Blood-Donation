@@ -1,8 +1,8 @@
 package com.example.blooddonation.model
 
 data class MessageModel(
-    val senderId: String = "",
-    val receiverId: String = "",
-    val text: String = "",
-    val timestamp: Long = System.currentTimeMillis()
+    var senderId: String = "",
+    var receiverId: String = "",
+    var text: String = "",
+    var timestamp: Long = System.currentTimeMillis()
 )

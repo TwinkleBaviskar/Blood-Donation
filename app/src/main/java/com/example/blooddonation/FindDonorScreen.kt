@@ -1,12 +1,15 @@
 package com.example.blooddonation
 
+import DonorModel
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+
 import com.google.firebase.database.*
 
 class FindDonorScreen : AppCompatActivity() {
@@ -46,11 +49,62 @@ class FindDonorScreen : AppCompatActivity() {
         userRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 donorList.clear()
+
                 if (snapshot.exists()) {
                     for (userSnap in snapshot.children) {
-                        val donor = userSnap.getValue(DonorModel::class.java)
-                        donor?.let { donorList.add(it) }
+                        try {
+                            val userId = userSnap.child("userId").value?.toString()
+                                ?: userSnap.key  // fallback: key as userId
+
+                            val fullName = userSnap.child("fullName").value?.toString()
+                            val email = userSnap.child("email").value?.toString()
+                            val mobile = userSnap.child("mobile").value?.toString()
+                            val age = userSnap.child("age").value?.toString()
+                            val gender = userSnap.child("gender").value?.toString()
+                            val bloodGroup = userSnap.child("bloodGroup").value?.toString()
+                            val weight = userSnap.child("weight").value?.toString()
+                            val hemoglobin = userSnap.child("hemoglobin").value?.toString()
+                            val lastDonation = userSnap.child("lastDonation").value?.toString()
+                            val profileImage = userSnap.child("profileImage").value?.toString()
+
+                            // livesSaved: safely Int me convert karo
+                            val livesSaved = when (val v = userSnap.child("livesSaved").value) {
+                                is Long -> v.toInt()
+                                is Int -> v
+                                is String -> v.toIntOrNull() ?: 0
+                                else -> 0
+                            }
+
+                            // totalDonations: safely Int me convert karo
+                            val totalDonations = when (val v = userSnap.child("totalDonations").value) {
+                                is Long -> v.toInt()
+                                is Int -> v
+                                is String -> v.toIntOrNull() ?: 0
+                                else -> 0
+                            }
+
+                            val donor = DonorModel(
+                                userId = userId,
+                                fullName = fullName,
+                                email = email,
+                                mobile = mobile,
+                                age = age,
+                                gender = gender,
+                                bloodGroup = bloodGroup,
+                                weight = weight,
+                                hemoglobin = hemoglobin,
+                                lastDonation = lastDonation,
+                                livesSaved = livesSaved,
+                                totalDonations = totalDonations,
+                                profileImage = profileImage
+                            )
+
+                            donorList.add(donor)
+                        } catch (e: Exception) {
+                            Log.e("FindDonorScreen", "Error parsing donor: ${e.message}", e)
+                        }
                     }
+
                     adapter.notifyDataSetChanged()
                 } else {
                     Toast.makeText(this@FindDonorScreen, "No donors found!", Toast.LENGTH_SHORT).show()

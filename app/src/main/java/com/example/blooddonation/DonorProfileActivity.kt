@@ -1,11 +1,13 @@
 package com.example.blooddonation
 
+import DonorModel
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseAuth
@@ -58,10 +60,10 @@ class DonorProfileActivity : AppCompatActivity() {
             } ?: Toast.makeText(this, "No phone number available", Toast.LENGTH_SHORT).show()
         }
 
-        // 🩸 Request donor
+        // 🩸 Request donor → yahan se RequestActivity open hogi
         requestButton.setOnClickListener {
-            Toast.makeText(this, "Request sent to ${donor.fullName}", Toast.LENGTH_SHORT).show()
 
+            // (1) Optional: jo tum pehle se kar rahi thi, wo bhi rakh sakti ho
             val sharedPref = getSharedPreferences("RequestedDonors", MODE_PRIVATE)
             val editor = sharedPref.edit()
 
@@ -71,13 +73,22 @@ class DonorProfileActivity : AppCompatActivity() {
 
             editor.putStringSet("donors", existing)
             editor.apply()
+
+            // (2) Ab RequestActivity open karo + data pass karo
+            val intent = Intent(this, RequestActivity::class.java)
+            intent.putExtra("donorId", donor.userId)
+            intent.putExtra("donorName", donor.fullName)
+            intent.putExtra("donorBloodGroup", donor.bloodGroup)
+            intent.putExtra("donorMobile", donor.mobile)
+            intent.putExtra("donorLastDonation", donor.lastDonation)
+            startActivity(intent)
         }
 
         // 🚫 Hide buttons if viewing own profile
         val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
         if (donor.userId == currentUserId) {
-            callButton.visibility = TextView.GONE
-            requestButton.visibility = TextView.GONE
+            callButton.visibility = View.GONE
+            requestButton.visibility = View.GONE
         }
     }
 }

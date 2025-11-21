@@ -1,6 +1,7 @@
 package com.example.blooddonation
 
 import android.app.AlertDialog
+import android.content.Context
 import android.os.Bundle
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
@@ -90,10 +91,14 @@ class RequestActivity : AppCompatActivity() {
 
         val timestamp = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
 
+        // ✅ REQUESTER KA NAAM fetch karo
+        val requesterName = getRequesterName()
+
         val requestMap = mapOf(
             "requestId" to requestId,
             "userId" to userId,
-            "patientName" to name,
+            "patientName" to name,              // Patient ka naam
+            "requesterName" to requesterName,   // ✅ Request bhejne wale ka naam (NAYA)
             "bloodGroup" to group,
             "urgency" to urgency,
             "hospital" to hospital,
@@ -113,6 +118,31 @@ class RequestActivity : AppCompatActivity() {
             }
     }
 
+    // ✅ NAYA FUNCTION - Current logged-in user ka naam nikalo
+    private fun getRequesterName(): String {
+        // Option 1: Firebase Auth se display name
+        val displayName = auth.currentUser?.displayName
+        if (!displayName.isNullOrBlank()) {
+            return displayName
+        }
+
+        // Option 2: SharedPreferences se (agar signup time save kiya ho)
+        val prefs = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
+        val savedName = prefs.getString("user_name", null)
+        if (!savedName.isNullOrBlank()) {
+            return savedName
+        }
+
+        // Option 3: Email se naam banao (last option)
+        val email = auth.currentUser?.email
+        if (!email.isNullOrBlank()) {
+            return email.substringBefore("@")
+        }
+
+        // Default fallback
+        return "Anonymous User"
+    }
+
     private fun showSuccessDialog(
         name: String,
         group: String,
@@ -127,7 +157,7 @@ class RequestActivity : AppCompatActivity() {
             """
             Blood Request Sent Successfully!
             
-            👤 Name: $name
+            👤 Patient Name: $name
             🩸 Blood Group: $group
             ⚡ Urgency: $urgency
             🏥 Hospital: $hospital

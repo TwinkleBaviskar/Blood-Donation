@@ -1,6 +1,5 @@
 package com.example.blooddonation.adapter
 
-import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
@@ -11,15 +10,17 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.blooddonation.R
 import com.example.blooddonation.model.BloodDonorModel
+import java.util.concurrent.TimeUnit
 
 class BloodDonorAdapter(
     private val context: Context,
     private var donorList: List<BloodDonorModel>,
-    private val onDonateClick: (String) -> Unit
+    private val onDonateClick: (BloodDonorModel) -> Unit
 ) : RecyclerView.Adapter<BloodDonorAdapter.DonorViewHolder>() {
 
     inner class DonorViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -50,55 +51,75 @@ class BloodDonorAdapter(
             if (donor.isUrgent) Color.parseColor("#FFF1F1") else Color.WHITE
         )
 
-        // Button behavior
-        if (donor.requestStatus.equals("completed", ignoreCase = true)) {
-            holder.donateButton.text = "Completed"
-            holder.donateButton.isEnabled = false
-            holder.donateButton.setBackgroundColor(Color.parseColor("#BDBDBD"))
-            holder.donateButton.setOnClickListener(null)
-        } else {
-            holder.donateButton.text = "Donate"
-            holder.donateButton.isEnabled = true
-            holder.donateButton.setBackgroundColor(Color.parseColor("#F44336"))
+        // ⏰ 12 hours expiry check
+        val now = System.currentTimeMillis()
+        val isExpired = donor.timestamp <= 0L ||
+                (now - donor.timestamp) > TimeUnit.HOURS.toMillis(12)
 
-            holder.donateButton.setOnClickListener {
-                showContactDialog(donor)
+        when {
+            donor.requestStatus.equals("completed", ignoreCase = true) -> {
+                holder.donateButton.text = "Completed"
+                holder.donateButton.isEnabled = false
+                holder.donateButton.setBackgroundColor(Color.parseColor("#BDBDBD"))
+                holder.donateButton.alpha = 0.7f
+                holder.donateButton.setOnClickListener(null)
+            }
+
+            isExpired -> {
+                holder.donateButton.text = "Expired"
+                holder.donateButton.isEnabled = false
+                holder.donateButton.setBackgroundColor(Color.parseColor("#BDBDBD"))
+                holder.donateButton.alpha = 0.7f
+                holder.donateButton.setOnClickListener {
+                    Toast.makeText(context, "This request has expired", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            else -> {
+                holder.donateButton.text = "Donate"
+                holder.donateButton.isEnabled = true
+                holder.donateButton.setBackgroundColor(Color.parseColor("#F44336"))
+                holder.donateButton.alpha = 1f
+
+                holder.donateButton.setOnClickListener {
+                    showContactDialog(donor)
+                }
             }
         }
     }
+
+    override fun getItemCount(): Int = donorList.size
+
+    fun updateList(newList: List<BloodDonorModel>) {
+        donorList = newList
+        notifyDataSetChanged()
+    }
+
+    // ================== DIALOG ==================
 
     private fun showContactDialog(donor: BloodDonorModel) {
         val builder = AlertDialog.Builder(context)
         builder.setTitle("Contact ${donor.name}")
         builder.setMessage("Choose how you want to contact:")
 
-        // Call
-        builder.setPositiveButton("📞 Call") { _, _ ->
-            val intent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:${donor.phone}"))
-            context.startActivity(intent)
-            // invoke callback to mark completed (as you used previously)
-            onDonateClick(donor.requestId)
+        // LEFT: CALL  -> NEUTRAL
+        builder.setNeutralButton("CALL") { _, _ ->
+            val phone = donor.phone
+            if (phone.isNotBlank()) {
+                val intent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:$phone"))
+                context.startActivity(intent)
+                // agar chaho to yahi pe mark complete wala logic use kar sakti ho
+                onDonateClick(donor)
+            } else {
+                Toast.makeText(context, "Phone number not available", Toast.LENGTH_SHORT).show()
+            }
         }
 
-        // Message
-        builder.setNegativeButton("💬 Message") { _, _ ->
-            Toast.makeText(context, "Opening chat with ${donor.name}", Toast.LENGTH_SHORT).show()
-            onDonateClick(donor.requestId)
-        }
-
-        // Cancel
-        builder.setNeutralButton("Cancel") { dialog, _ ->
+        // RIGHT: CANCEL -> POSITIVE
+        builder.setPositiveButton("CANCEL") { dialog, _ ->
             dialog.dismiss()
         }
 
         builder.show()
-    }
-
-    override fun getItemCount(): Int = donorList.size
-
-    // Now updateList simply replaces list (no forced sorting here)
-    fun updateList(newList: List<BloodDonorModel>) {
-        donorList = newList
-        notifyDataSetChanged()
     }
 }

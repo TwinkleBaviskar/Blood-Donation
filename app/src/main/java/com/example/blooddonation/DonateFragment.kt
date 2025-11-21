@@ -1,5 +1,7 @@
 package com.example.blooddonation.fragment
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -10,11 +12,13 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.blooddonation.R
+import com.example.blooddonation.HomeScreenActivity
 import com.example.blooddonation.adapter.BloodDonorAdapter
 import com.example.blooddonation.model.BloodDonorModel
 import com.google.firebase.database.*
@@ -34,14 +38,12 @@ class DonateFragment : Fragment() {
     private lateinit var database: FirebaseDatabase
     private lateinit var requestRef: DatabaseReference
 
-    // Handler for periodic timeAgo updates
     private val timeHandler = Handler(Looper.getMainLooper())
-    private val timeUpdateIntervalMs = 60_000L // update every 60 seconds
+    private val timeUpdateIntervalMs = 60_000L
 
     private val timeUpdater = object : Runnable {
         override fun run() {
             try {
-                // Recompute timeAgo for each model and refresh adapter
                 val refreshed = donorList.map { model ->
                     val newTimeAgo = if (model.timestamp > 0L) {
                         formatTimeAgo(model.timestamp)
@@ -54,7 +56,6 @@ class DonateFragment : Fragment() {
                 donorList.clear()
                 donorList.addAll(refreshed)
 
-                // Keep default sorting (urgent first then latest)
                 val sorted = donorList.sortedWith(
                     compareByDescending<BloodDonorModel> { it.isUrgent }
                         .thenByDescending { it.timestamp }
@@ -74,37 +75,36 @@ class DonateFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_donate, container, false)
 
-        // Back button
         val backArrow: ImageView = view.findViewById(R.id.backArrow)
         backArrow.setOnClickListener {
-            requireActivity().onBackPressedDispatcher.onBackPressed()
+            val intent = Intent(requireContext(), HomeScreenActivity::class.java)
+            startActivity(intent)
+            requireActivity().finish()
         }
 
         recyclerView = view.findViewById(R.id.recyclerDonors)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
-        database = FirebaseDatabase.getInstance("https://blooddonation-bbec8-default-rtdb.asia-southeast1.firebasedatabase.app/")
+        database = FirebaseDatabase.getInstance(
+            "https://blooddonation-bbec8-default-rtdb.asia-southeast1.firebasedatabase.app/"
+        )
         requestRef = database.getReference("requests")
 
-        adapter = BloodDonorAdapter(requireContext(), listOf()) { requestId ->
-            markRequestAsCompleted(requestId)
+        adapter = BloodDonorAdapter(requireContext(), listOf()) { donorModel ->
+            showContactDialog(donorModel)
         }
-
         recyclerView.adapter = adapter
 
-        // Load requests
         loadRequestsFromFirebase()
 
         val btnAll = view.findViewById<Button>(R.id.btnAll)
         val btnRecent = view.findViewById<Button>(R.id.btnRecent)
         val btnUrgent = view.findViewById<Button>(R.id.btnUrgent)
 
-        // Default selected visual
         btnAll.isSelected = true
         btnRecent.isSelected = false
         btnUrgent.isSelected = false
 
-        // ALL: urgent first, then normal, within each group newest first
         btnAll.setOnClickListener {
             btnAll.isSelected = true
             btnRecent.isSelected = false
@@ -117,7 +117,6 @@ class DonateFragment : Fragment() {
             adapter.updateList(allList)
         }
 
-        // RECENT: requests within last 8 hours, newest first
         btnRecent.setOnClickListener {
             btnAll.isSelected = false
             btnRecent.isSelected = true
@@ -130,7 +129,6 @@ class DonateFragment : Fragment() {
             adapter.updateList(recentList)
         }
 
-        // URGENT: only urgent requests, newest first
         btnUrgent.setOnClickListener {
             btnAll.isSelected = false
             btnRecent.isSelected = false
@@ -146,13 +144,11 @@ class DonateFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        // Start periodic updates for timeAgo labels
         timeHandler.post(timeUpdater)
     }
 
     override fun onPause() {
         super.onPause()
-        // Stop updates to avoid leaks
         timeHandler.removeCallbacks(timeUpdater)
     }
 
@@ -167,27 +163,43 @@ class DonateFragment : Fragment() {
                             for (reqSnap in snapshot.children) {
                                 try {
                                     val requestId = reqSnap.key ?: continue
-                                    val name = reqSnap.child("patientName").getValue(String::class.java) ?: "Unknown"
-                                    val bloodGroup = reqSnap.child("bloodGroup").getValue(String::class.java) ?: "-"
-                                    val urgency = reqSnap.child("urgency").getValue(String::class.java) ?: "Normal"
-                                    val hospital = reqSnap.child("hospital").getValue(String::class.java) ?: "Not specified"
-                                    val contact = reqSnap.child("contact").getValue(String::class.java) ?: "N/A"
-                                    val status = reqSnap.child("status").getValue(String::class.java) ?: "active"
 
-                                    // Safe timestamp parsing via normalizeTimestamp()
+                                    val userId = reqSnap.child("userId")
+                                        .getValue(String::class.java) ?: ""
+
+                                    val name = reqSnap.child("patientName")
+                                        .getValue(String::class.java) ?: "Unknown"
+                                    val bloodGroup = reqSnap.child("bloodGroup")
+                                        .getValue(String::class.java) ?: "-"
+                                    val urgency = reqSnap.child("urgency")
+                                        .getValue(String::class.java) ?: "Normal"
+                                    val hospital = reqSnap.child("hospital")
+                                        .getValue(String::class.java) ?: "Not specified"
+                                    val contact = reqSnap.child("contact")
+                                        .getValue(String::class.java) ?: "N/A"
+                                    val status = reqSnap.child("status")
+                                        .getValue(String::class.java) ?: "active"
+
                                     val tsValue = reqSnap.child("timestamp").value
                                     val timeMillis: Long = normalizeTimestamp(tsValue)
 
-                                    // Debug (important small line to help if still fails)
-                                    Log.d("DonateFragment", "Request: $requestId | Raw: $tsValue | Parsed: $timeMillis | TimeAgo: ${formatTimeAgo(timeMillis)}")
+                                    Log.d(
+                                        "DonateFragment",
+                                        "Request: $requestId | Raw: $tsValue | Parsed: $timeMillis | TimeAgo: ${formatTimeAgo(timeMillis)}"
+                                    )
 
-                                    val isUrgent = urgency.equals("Emergency", ignoreCase = true) ||
-                                            urgency.equals("Urgent", ignoreCase = true)
+                                    val isUrgent =
+                                        urgency.equals("Emergency", ignoreCase = true) ||
+                                                urgency.equals("Urgent", ignoreCase = true)
 
-                                    val timeAgoText = if (timeMillis <= 0L) "time unknown" else formatTimeAgo(timeMillis)
+                                    val timeAgoText =
+                                        if (timeMillis <= 0L) "time unknown" else formatTimeAgo(
+                                            timeMillis
+                                        )
 
                                     temp.add(
                                         BloodDonorModel(
+                                            userId = userId,
                                             name = name,
                                             bloodGroup = bloodGroup,
                                             location = hospital,
@@ -207,11 +219,9 @@ class DonateFragment : Fragment() {
                         temp
                     }
 
-                    // Update UI on main thread
                     donorList.clear()
                     donorList.addAll(parsedList)
 
-                    // Always update adapter (never leave it stale)
                     val sorted = donorList.sortedWith(
                         compareByDescending<BloodDonorModel> { it.isUrgent }
                             .thenByDescending { it.timestamp }
@@ -219,13 +229,21 @@ class DonateFragment : Fragment() {
                     adapter.updateList(sorted)
 
                     if (donorList.isEmpty()) {
-                        Toast.makeText(requireContext(), "No active requests!", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            requireContext(),
+                            "No active requests!",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
             }
 
             override fun onCancelled(error: DatabaseError) {
-                Toast.makeText(requireContext(), "Error: ${error.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    requireContext(),
+                    "Error: ${error.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         })
     }
@@ -233,17 +251,55 @@ class DonateFragment : Fragment() {
     private fun markRequestAsCompleted(requestId: String) {
         requestRef.child(requestId).child("status").setValue("completed")
             .addOnSuccessListener {
-                Toast.makeText(requireContext(), "✅ Request marked as completed", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    requireContext(),
+                    "✅ Request marked as completed",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
             .addOnFailureListener {
-                Toast.makeText(requireContext(), "❌ Failed: ${it.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    requireContext(),
+                    "❌ Failed: ${it.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
     }
 
-    // Robust timestamp normalization
+    // ✅ Ab sirf CALL & CANCEL
+    private fun showContactDialog(donor: BloodDonorModel) {
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setTitle("Contact ${donor.name}")
+
+        val options = arrayOf("CALL", "CANCEL")
+
+        builder.setItems(options) { dialog, which ->
+            when (which) {
+                0 -> { // CALL
+                    val phone = donor.phone
+                    if (phone.isNotBlank()) {
+                        val intent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:$phone"))
+                        startActivity(intent)
+                    } else {
+                        Toast.makeText(
+                            requireContext(),
+                            "Phone number not available",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+
+                1 -> { // CANCEL
+                    dialog.dismiss()
+                }
+            }
+        }
+
+        builder.show()
+    }
+
     private fun normalizeTimestamp(raw: Any?): Long {
         try {
-            // Handle numeric types directly
             when (raw) {
                 is Long -> return if (raw < 1_000_000_000_000L) raw * 1000L else raw
                 is Int -> {
@@ -260,11 +316,9 @@ class DonateFragment : Fragment() {
                 }
                 is String -> {
                     val s = raw.trim()
-                    // numeric string?
                     s.toLongOrNull()?.let { n ->
                         return if (n < 1_000_000_000_000L) n * 1000L else n
                     }
-                    // try common date formats like "yyyy-MM-dd HH:mm:ss"
                     val patterns = arrayOf(
                         "yyyy-MM-dd HH:mm:ss",
                         "yyyy-MM-dd'T'HH:mm:ss'Z'",
@@ -275,28 +329,29 @@ class DonateFragment : Fragment() {
                     for (p in patterns) {
                         try {
                             val sdf = SimpleDateFormat(p, Locale.getDefault())
-                            if (p.contains("'Z'")) sdf.timeZone = TimeZone.getTimeZone("UTC")
+                            if (p.contains("'Z'"))
+                                sdf.timeZone = TimeZone.getTimeZone("UTC")
                             val d = sdf.parse(s)
                             if (d != null) return d.time
-                        } catch (_: Exception) { /* try next */ }
+                        } catch (_: Exception) {
+                        }
                     }
-                    // last attempt: ISO style
                     try {
                         val iso = s.replace(" ", "T")
                         val instant = java.time.Instant.parse("${iso}Z")
                         return instant.toEpochMilli()
-                    } catch (_: Exception) { /* ignore */ }
+                    } catch (_: Exception) {
+                    }
                     Log.w("DonateFragment", "Invalid string timestamp: $s")
                     return System.currentTimeMillis()
                 }
-                // Firebase ServerValue may appear as a Map while pending; handle that
                 is Map<*, *> -> {
-                    // Common case: {\".sv\"=\"timestamp\"} or similar - treat as pending timestamp
-                    if (raw.containsKey(".sv") || raw.containsKey("\$sv") || raw.containsKey("timestamp")) {
-                        // Use current time as temporary value until server resolves
+                    if (raw.containsKey(".sv") ||
+                        raw.containsKey("\$sv") ||
+                        raw.containsKey("timestamp")
+                    ) {
                         return System.currentTimeMillis()
                     }
-                    // else unknown map: fallback
                     return System.currentTimeMillis()
                 }
                 is com.google.firebase.Timestamp -> return raw.toDate().time
@@ -309,19 +364,12 @@ class DonateFragment : Fragment() {
         }
     }
 
-    /**
-     * Format timestamp to human-readable "time ago" string
-     */
     private fun formatTimeAgo(timestamp: Long): String {
         if (timestamp <= 0) return "time unknown"
 
         val now = System.currentTimeMillis()
         val diffMillis = now - timestamp
-
-        // Handle future timestamps
-        if (diffMillis < 0) {
-            return "just now"
-        }
+        if (diffMillis < 0) return "just now"
 
         val seconds = TimeUnit.MILLISECONDS.toSeconds(diffMillis)
         val minutes = TimeUnit.MILLISECONDS.toMinutes(diffMillis)

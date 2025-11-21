@@ -1,11 +1,11 @@
 package com.example.blooddonation.model
 
 data class ReportModel(
-    val name: String,
-    val bloodGroup: String,
-    val weight: String,
-    val lastDonation: String,
-    val nextDonation: String,
-    val hemoglobin: String,
-    val eligibility: String
+    var name: String? = null,
+    var bloodGroup: String? = null,
+    var weight: String? = null,
+    var lastDonation: String? = null,
+    var nextDonation: String? = null,
+    var hemoglobin: String? = null,
+    var eligibility: String? = null
 )

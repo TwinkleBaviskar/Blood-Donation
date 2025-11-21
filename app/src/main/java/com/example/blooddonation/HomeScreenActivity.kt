@@ -22,14 +22,13 @@ class HomeScreenActivity : AppCompatActivity() {
     private lateinit var imgBloodBank: ImageView
     private lateinit var imgReport: ImageView
     private lateinit var imgRequest: ImageView
-    private lateinit var imgProfile: ImageView // 👤 Profile icon
+    private lateinit var imgProfile: ImageView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_home_screen)
 
-        // 🔹 Initialize IDs
         imgHome = findViewById(R.id.imgHome)
         imgMessage = findViewById(R.id.imgMessage)
         imgFindDonor = findViewById(R.id.imgFindDonor)
@@ -45,43 +44,39 @@ class HomeScreenActivity : AppCompatActivity() {
             findViewById<View>(R.id.fragment_container).visibility = View.GONE
         }
 
-        // 💬 Message icon → open message list screen
+        // 💬 Chat List
         imgMessage.setOnClickListener {
             openFragment(MessageListFragment())
         }
 
-        // 🔍 Find Donor
+        // 🔍 Find Donor Screen
         imgFindDonor.setOnClickListener {
-            val intent = Intent(this, FindDonorScreen::class.java)
-            startActivity(intent)
+            startActivity(Intent(this, FindDonorScreen::class.java))
         }
 
-        // ❤️ Donate
+        // ❤️ Donate Fragment
         imgDonate.setOnClickListener {
             openFragment(DonateFragment())
         }
 
-        // 🩸 Blood Bank
+        // 🏥 Blood Bank Fragment
         imgBloodBank.setOnClickListener {
             openFragment(BloodBankFragment())
         }
 
-        // 📊 Report Detail → open ReportActivity
+        // 📊 Report Activity
         imgReport.setOnClickListener {
-            val intent = Intent(this, ReportActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(this, ReportActivity::class.java))
         }
 
-        // 📩 Request Button → Open RequestActivity
+        // 📩 Request Activity
         imgRequest.setOnClickListener {
-            val intent = Intent(this, RequestActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(this, RequestActivity::class.java))
         }
 
-        // 👤 Profile → Open ProfileScreenActivity
+        // 👤 Profile Screen
         imgProfile.setOnClickListener {
-            val intent = Intent(this, ProfileScreenActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(this, ProfileScreenActivity::class.java))
         }
     }
 
@@ -111,23 +106,25 @@ class HomeScreenActivity : AppCompatActivity() {
         }
     }
 
-    fun openMessageFragment(donorName: String) {
+    // 🔥 UPDATED: Now accepts both UID + Name
+    fun openMessageFragment(otherUserId: String, otherName: String) {
         try {
             runOnUiThread {
                 findViewById<View>(R.id.scroll_content).visibility = View.GONE
                 findViewById<View>(R.id.fragment_container).visibility = View.VISIBLE
 
-                val fragment = MessageFragment.newInstance(donorName, "")
+                val fragment = MessageFragment.newInstance(otherUserId, otherName)
+
                 supportFragmentManager.beginTransaction()
                     .replace(R.id.fragment_container, fragment)
                     .addToBackStack(null)
                     .commitAllowingStateLoss()
 
-                Toast.makeText(this, "Chat with $donorName", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Chat with $otherName", Toast.LENGTH_SHORT).show()
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            Toast.makeText(this, "Message feature not available yet", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Chat feature error", Toast.LENGTH_SHORT).show()
         }
     }
 }

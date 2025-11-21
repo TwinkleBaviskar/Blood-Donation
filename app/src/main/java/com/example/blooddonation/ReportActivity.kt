@@ -3,17 +3,26 @@ package com.example.blooddonation
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.widget.EditText
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import android.widget.EditText
 import com.example.blooddonation.adapter.ReportAdapter
 import com.example.blooddonation.model.ReportModel
+import com.google.firebase.database.*
 
 class ReportActivity : AppCompatActivity() {
 
     private lateinit var adapter: ReportAdapter
-    private lateinit var reportList: ArrayList<ReportModel>
+    private var reportList: ArrayList<ReportModel> = ArrayList()
+    private var allReports: ArrayList<ReportModel> = ArrayList()
+
+    private lateinit var dbRef: DatabaseReference
+
+    // 🔗 tumhara REAL database URL (logcat ne jo diya)
+    private val DATABASE_URL =
+        "https://blooddonation-bbec8-default-rtdb.asia-southeast1.firebasedatabase.app"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,20 +31,18 @@ class ReportActivity : AppCompatActivity() {
         val etSearch = findViewById<EditText>(R.id.etSearch)
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerReports)
 
-        // 🧠 Dummy data – later you can replace this with Firebase or Registration data
-        reportList = arrayListOf(
-            ReportModel("Aarav Mehta", "A+", "65 kg", "01 Aug 2024", "01 Nov 2024", "14.2 g/dL", "Eligible"),
-            ReportModel("Riya Sharma", "B-", "50 kg", "10 Sep 2024", "10 Dec 2024", "11.8 g/dL", "Not Eligible"),
-            ReportModel("Kabir Singh", "O+", "72 kg", "20 Jul 2024", "20 Oct 2024", "15.1 g/dL", "Eligible"),
-            ReportModel("Meena Patel", "AB+", "54 kg", "15 Aug 2024", "15 Nov 2024", "12.5 g/dL", "Eligible")
-        )
+        // ✅ IMPORTANT: yahan URL ke sath instance lo
+        val db = FirebaseDatabase.getInstance(DATABASE_URL)
 
-        // ✅ Adapter setup
+        // yahan EXACT node ka naam use karo: "users" ya "Users"
+        dbRef = db.getReference("users")
+
         adapter = ReportAdapter(reportList)
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = adapter
 
-        // 🔍 Live Search functionality
+        loadReportsFromUsersTable()
+
         etSearch.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {}
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -45,14 +52,88 @@ class ReportActivity : AppCompatActivity() {
         })
     }
 
-    // 🔎 Search filter logic
+    private fun loadReportsFromUsersTable() {
+        dbRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                reportList.clear()
+                allReports.clear()
+
+                if (!snapshot.hasChildren()) {
+                    Toast.makeText(
+                        this@ReportActivity,
+                        "users table me koi data nahi mila",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+                for (userSnapshot in snapshot.children) {
+
+                    val name =
+                        userSnapshot.child("fullName").getValue(String::class.java)
+                            ?: userSnapshot.child("name").getValue(String::class.java)
+                            ?: "Unknown"
+
+                    val bloodGroup =
+                        userSnapshot.child("bloodGroup").getValue(String::class.java)
+
+                    val weightRaw =
+                        userSnapshot.child("weight").getValue(String::class.java)
+                    val weight = when {
+                        weightRaw.isNullOrEmpty() -> null
+                        weightRaw.contains("kg", ignoreCase = true) -> weightRaw
+                        else -> "$weightRaw kg"
+                    }
+
+                    val lastDonation =
+                        userSnapshot.child("lastDonation").getValue(String::class.java)
+
+                    val hbRaw =
+                        userSnapshot.child("hemoglobin").getValue(String::class.java)
+                    val hemoglobin = when {
+                        hbRaw.isNullOrEmpty() -> null
+                        hbRaw.contains("g/dL", ignoreCase = true) -> hbRaw
+                        else -> "$hbRaw g/dL"
+                    }
+
+                    val report = ReportModel(
+                        name = name,
+                        bloodGroup = bloodGroup,
+                        weight = weight,
+                        lastDonation = lastDonation,
+                        hemoglobin = hemoglobin
+                    )
+
+                    reportList.add(report)
+                    allReports.add(report)
+                }
+
+                adapter.filterList(ArrayList(reportList))
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Toast.makeText(
+                    this@ReportActivity,
+                    "Error: ${error.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        })
+    }
+
     private fun filter(text: String) {
         val filteredList = ArrayList<ReportModel>()
-        for (item in reportList) {
-            if (item.name.contains(text, ignoreCase = true)) {
-                filteredList.add(item)
+
+        if (text.isEmpty()) {
+            filteredList.addAll(allReports)
+        } else {
+            for (item in allReports) {
+                val name = item.name ?: ""
+                if (name.contains(text, ignoreCase = true)) {
+                    filteredList.add(item)
+                }
             }
         }
+
         adapter.filterList(filteredList)
     }
 }

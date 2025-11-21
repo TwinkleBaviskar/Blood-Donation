@@ -1,5 +1,6 @@
 package com.example.blooddonation.adapter
 
+import android.graphics.Typeface
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -7,36 +8,60 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.blooddonation.R
 import com.example.blooddonation.model.MessageListModel
+import java.text.SimpleDateFormat
+import java.util.*
 
 class MessageListAdapter(
-    private val chatList: List<MessageListModel>,
-    private val onChatClick: (String) -> Unit
-) : RecyclerView.Adapter<MessageListAdapter.ChatViewHolder>() {
+    private var list: List<MessageListModel>,
+    private val onClick: (MessageListModel) -> Unit
+) : RecyclerView.Adapter<MessageListAdapter.ViewHolder>() {
 
-    inner class ChatViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        // Using IDs from item_chat_user.xml
-        val txtName: TextView = itemView.findViewById(R.id.txtUserName)
-        val txtMessage: TextView = itemView.findViewById(R.id.txtLastMsg)
-        val txtTime: TextView = itemView.findViewById(R.id.txtTime)
+    inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val txtName: TextView = view.findViewById(R.id.txtUserName)
+        val txtLast: TextView = view.findViewById(R.id.txtLastMsg)
+        val txtTime: TextView = view.findViewById(R.id.txtTime)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChatViewHolder {
-        // Inflate the layout file you actually created (item_chat_user.xml)
-        val view = LayoutInflater.from(parent.context)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val v = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_chat_user, parent, false)
-        return ChatViewHolder(view)
+        return ViewHolder(v)
     }
 
-    override fun onBindViewHolder(holder: ChatViewHolder, position: Int) {
-        val chat = chatList[position]
-        holder.txtName.text = chat.name
-        holder.txtMessage.text = chat.lastMessage
-        holder.txtTime.text = chat.time
+    override fun getItemCount(): Int = list.size
 
-        holder.itemView.setOnClickListener {
-            onChatClick(chat.name)
+    override fun onBindViewHolder(holder: ViewHolder, pos: Int) {
+        val user = list[pos]
+
+        holder.txtName.text = user.name
+
+        if (user.lastMessage.isNotEmpty()) {
+
+            // 🔥 Chat user
+            holder.txtLast.visibility = View.VISIBLE
+            holder.txtTime.visibility = View.VISIBLE
+
+            holder.txtLast.text = user.lastMessage
+            holder.txtName.setTypeface(null, Typeface.BOLD)
+
+            // Time formatting
+            val sdf = SimpleDateFormat("hh:mm a", Locale.getDefault())
+            holder.txtTime.text = sdf.format(Date(user.lastTimestamp))
+
+        } else {
+
+            // 🤍 Normal user
+            holder.txtLast.visibility = View.GONE
+            holder.txtTime.visibility = View.GONE
+
+            holder.txtName.setTypeface(null, Typeface.NORMAL)
         }
+
+        holder.itemView.setOnClickListener { onClick(user) }
     }
 
-    override fun getItemCount(): Int = chatList.size
+    fun updateList(newList: List<MessageListModel>) {
+        list = newList
+        notifyDataSetChanged()
+    }
 }

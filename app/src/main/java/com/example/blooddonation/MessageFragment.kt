@@ -13,66 +13,150 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.blooddonation.R
 import com.example.blooddonation.adapter.MessageAdapter
 import com.example.blooddonation.model.MessageModel
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.*
 
 class MessageFragment : Fragment() {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: MessageAdapter
-    private lateinit var edtMessage: EditText   // ✅ Changed here
+    private lateinit var edtMessage: EditText
     private lateinit var btnSend: ImageView
-    private lateinit var txtHeaderName: TextView
+    private lateinit var txtHeader: TextView
 
-    private val messageList = mutableListOf<MessageModel>()
+    private val messageList = ArrayList<MessageModel>()
 
-    private var currentUserId = "user1"
-    private var receiverId: String = "user2"
-    private var donorName: String? = null
+    private lateinit var db: FirebaseDatabase
+    private lateinit var auth: FirebaseAuth
+    private lateinit var msgRef: DatabaseReference
+    private lateinit var convRef: DatabaseReference
+
+    private var otherUserId = ""
+    private var otherName = ""
+
+    private val DATABASE_URL =
+        "https://blooddonation-bbec8-default-rtdb.asia-southeast1.firebasedatabase.app"
+
+    private val currentUserId get() = auth.currentUser?.uid ?: ""
 
     companion object {
-        fun newInstance(donorName: String, donorId: String): MessageFragment {
-            val fragment = MessageFragment()
-            val args = Bundle()
-            args.putString("donorName", donorName)
-            args.putString("donorId", donorId)
-            fragment.arguments = args
-            return fragment
+        fun newInstance(otherId: String, otherName: String): MessageFragment {
+            val f = MessageFragment()
+            val b = Bundle()
+            b.putString("otherUserId", otherId)
+            b.putString("otherName", otherName)
+            f.arguments = b
+            return f
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        donorName = arguments?.getString("donorName")
-        receiverId = arguments?.getString("donorId") ?: "user2"
+
+        auth = FirebaseAuth.getInstance()
+        db = FirebaseDatabase.getInstance(DATABASE_URL)
+
+        otherUserId = arguments?.getString("otherUserId") ?: ""
+        otherName = arguments?.getString("otherName") ?: ""
+
+        val chatId = if (currentUserId < otherUserId)
+            "${currentUserId}_${otherUserId}"
+        else
+            "${otherUserId}_${currentUserId}"
+
+        msgRef = db.getReference("messages").child(chatId)
+        convRef = db.getReference("conversations")
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_message, container, false)
+        val v = inflater.inflate(R.layout.fragment_message, container, false)
 
-        recyclerView = view.findViewById(R.id.recyclerMessages)
-        edtMessage = view.findViewById(R.id.edtMessage)   // ✅ Matches <EditText> in XML
-        btnSend = view.findViewById(R.id.btnSend)
-        txtHeaderName = view.findViewById(R.id.txtHeaderName)
+        recyclerView = v.findViewById(R.id.recyclerMessages)
+        edtMessage = v.findViewById(R.id.edtMessage)
+        btnSend = v.findViewById(R.id.btnSend)
+        txtHeader = v.findViewById(R.id.txtHeaderName)
+        txtHeader.text = otherName
 
-        txtHeaderName.text = donorName ?: "Chat"
+        recyclerView.layoutManager = LinearLayoutManager(requireContext()).apply {
+            stackFromEnd = true
+        }
 
-        recyclerView.layoutManager = LinearLayoutManager(requireContext())
         adapter = MessageAdapter(messageList, currentUserId)
         recyclerView.adapter = adapter
 
-        btnSend.setOnClickListener {
-            val msgText = edtMessage.text.toString().trim()
-            if (msgText.isNotEmpty()) {
-                val message = MessageModel(currentUserId, receiverId, msgText)
-                messageList.add(message)
-                adapter.notifyItemInserted(messageList.size - 1)
-                recyclerView.scrollToPosition(messageList.size - 1)
-                edtMessage.setText("")
-            }
+        btnSend.setOnClickListener { sendMessage() }
+
+        listenMessages()
+
+        return v
+    }
+
+    private fun sendMessage() {
+        val text = edtMessage.text.toString().trim()
+        if (text.isEmpty()) return
+
+        val key = msgRef.push().key ?: return
+
+        val msg = MessageModel(
+            senderId = currentUserId,
+            receiverId = otherUserId,
+            text = text,
+            timestamp = System.currentTimeMillis()
+        )
+
+        msgRef.child(key).setValue(msg).addOnSuccessListener {
+            updateConversations(text)
         }
 
-        return view
+        edtMessage.setText("")
+    }
+
+    private fun updateConversations(text: String) {
+
+        val time = System.currentTimeMillis()
+
+        // Sender side
+        val senderMap = mapOf(
+            "otherUserId" to otherUserId,
+            "otherName" to otherName,
+            "lastMessage" to text,
+            "lastTimestamp" to time
+        )
+
+        convRef.child(currentUserId).child(otherUserId).setValue(senderMap)
+
+        // Receiver side
+        val myName = auth.currentUser?.email?.substringBefore("@") ?: "User"
+
+        val receiverMap = mapOf(
+            "otherUserId" to currentUserId,
+            "otherName" to myName,
+            "lastMessage" to text,
+            "lastTimestamp" to time
+        )
+
+        convRef.child(otherUserId).child(currentUserId).setValue(receiverMap)
+    }
+
+    private fun listenMessages() {
+        msgRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                messageList.clear()
+
+                for (m in snapshot.children) {
+                    val message = m.getValue(MessageModel::class.java)
+                    if (message != null) messageList.add(message)
+                }
+
+                adapter.notifyDataSetChanged()
+                recyclerView.scrollToPosition(messageList.size - 1)
+            }
+
+            override fun onCancelled(error: DatabaseError) {}
+        })
     }
 }
