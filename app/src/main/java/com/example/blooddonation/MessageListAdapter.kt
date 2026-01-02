@@ -32,31 +32,25 @@ class MessageListAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, pos: Int) {
         val user = list[pos]
-
         holder.txtName.text = user.name
 
         if (user.lastMessage.isNotEmpty()) {
 
-            // 🔥 Chat user
             holder.txtLast.visibility = View.VISIBLE
             holder.txtTime.visibility = View.VISIBLE
 
             holder.txtLast.text = user.lastMessage
             holder.txtName.setTypeface(null, Typeface.BOLD)
 
-            // Time formatting
             val sdf = SimpleDateFormat("hh:mm a", Locale.getDefault())
             holder.txtTime.text = sdf.format(Date(user.lastTimestamp))
 
         } else {
 
-            // 🤍 Normal user
             holder.txtLast.visibility = View.GONE
             holder.txtTime.visibility = View.GONE
-
             holder.txtName.setTypeface(null, Typeface.NORMAL)
         }
-
         holder.itemView.setOnClickListener { onClick(user) }
     }
 

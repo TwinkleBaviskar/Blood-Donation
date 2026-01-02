@@ -21,8 +21,6 @@ class LoginActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         auth = FirebaseAuth.getInstance()
-
-        // 🔹 Login Button
         binding.btnSignIn.setOnClickListener {
             val email = binding.editTextEmail.text.toString().trim()
             val password = binding.editTextPassword.text.toString().trim()
@@ -48,12 +46,10 @@ class LoginActivity : AppCompatActivity() {
                 }
         }
 
-        // 🔹 Go to Sign Up
         binding.txtSignup.setOnClickListener {
             startActivity(Intent(this, RegistrationActivity::class.java))
         }
 
-        // 🔹 Forgot Password
         binding.forgotPassword.setOnClickListener {
             startActivity(Intent(this, ForgotpassActivity::class.java))
         }

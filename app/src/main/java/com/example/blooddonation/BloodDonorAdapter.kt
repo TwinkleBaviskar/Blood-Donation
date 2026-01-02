@@ -104,7 +104,6 @@ class BloodDonorAdapter(
             if (phone.isNotBlank()) {
                 val intent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:$phone"))
                 context.startActivity(intent)
-                // agar chaho to yahi pe mark complete wala logic use kar sakti ho
                 onDonateClick(donor)
             } else {
                 Toast.makeText(context, "Phone number not available", Toast.LENGTH_SHORT).show()

@@ -37,7 +37,6 @@ class NotificationFragment : Fragment() {
         )
 
         notiRef = db.getReference("notifications").child("all")
-
         binding.recyclerNotifications.layoutManager = LinearLayoutManager(requireContext())
         adapter = NotificationAdapter(notificationList)
         binding.recyclerNotifications.adapter = adapter
@@ -55,12 +54,9 @@ class NotificationFragment : Fragment() {
                     if (model != null) notificationList.add(model)
                 }
 
-                // newest first
                 notificationList.sortByDescending { it.timestamp }
-
                 adapter.notifyDataSetChanged()
 
-                // empty state
                 binding.txtEmpty.visibility =
                     if (notificationList.isEmpty()) View.VISIBLE else View.GONE
             }

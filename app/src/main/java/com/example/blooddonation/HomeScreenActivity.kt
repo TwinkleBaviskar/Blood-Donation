@@ -55,19 +55,18 @@ class HomeScreenActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_home_screen)
 
-        // ⭐ OSM config
         Configuration.getInstance().load(
             this,
             getSharedPreferences("osm_prefs", MODE_PRIVATE)
         )
         Configuration.getInstance().userAgentValue = packageName
 
-        // ⭐ Firebase init
+
         firebaseAuth = FirebaseAuth.getInstance()
         firebaseDb = FirebaseDatabase.getInstance(DATABASE_URL)
         usersRef = firebaseDb.getReference("users")
 
-        // ⭐ Init Views
+
         imgHome = findViewById(R.id.imgHome)
         imgMessage = findViewById(R.id.imgMessage)
         imgFindDonor = findViewById(R.id.imgFindDonor)
@@ -77,9 +76,9 @@ class HomeScreenActivity : AppCompatActivity() {
         imgRequest = findViewById(R.id.imgRequest)
         imgProfile = findViewById(R.id.imgProfile)
         imgNotification = findViewById(R.id.imgNotification)
-        editSearch = findViewById(R.id.editSearch)   // ⭐ from XML
+        editSearch = findViewById(R.id.editSearch)
 
-        // ⭐ MAP
+
         osmMap = findViewById(R.id.osmMap)
         osmMap.setTileSource(TileSourceFactory.MAPNIK)
         osmMap.setMultiTouchControls(true)
@@ -87,16 +86,11 @@ class HomeScreenActivity : AppCompatActivity() {
 
         fusedLocation = LocationServices.getFusedLocationProviderClient(this)
         getCurrentLocation()
-
-        // ⭐ SEARCH LISTENER
         setupSearchBar()
-
-        // ⭐ Navigation Listeners
         setupNavigation()
     }
 
     private fun setupSearchBar() {
-        // TextWatcher hata diya, ab sirf jab user "Search" dabayega tab chalega
         editSearch.setOnEditorActionListener { v, actionId, _ ->
             if (actionId == android.view.inputmethod.EditorInfo.IME_ACTION_SEARCH) {
                 val text = v.text.toString().trim()
@@ -105,12 +99,10 @@ class HomeScreenActivity : AppCompatActivity() {
                     val intent = Intent(this@HomeScreenActivity, FindDonorScreen::class.java)
                     intent.putExtra("searchQuery", text)
                     startActivity(intent)
-
-                    // optional: text clear + focus hata do
                     v.text = null
                     v.clearFocus()
                 }
-                true   // action consume kar liya
+                true
             } else {
                 false
             }

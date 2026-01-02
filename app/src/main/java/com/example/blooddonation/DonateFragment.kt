@@ -266,7 +266,6 @@ class DonateFragment : Fragment() {
             }
     }
 
-    // ✅ Ab sirf CALL & CANCEL
     private fun showContactDialog(donor: BloodDonorModel) {
         val builder = AlertDialog.Builder(requireContext())
         builder.setTitle("Contact ${donor.name}")
@@ -275,7 +274,7 @@ class DonateFragment : Fragment() {
 
         builder.setItems(options) { dialog, which ->
             when (which) {
-                0 -> { // CALL
+                0 -> {
                     val phone = donor.phone
                     if (phone.isNotBlank()) {
                         val intent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:$phone"))
@@ -289,7 +288,7 @@ class DonateFragment : Fragment() {
                     }
                 }
 
-                1 -> { // CANCEL
+                1 -> {
                     dialog.dismiss()
                 }
             }

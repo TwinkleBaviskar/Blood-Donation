@@ -47,14 +47,8 @@ class ReportAdapter(
         holder.tvName.text = "👤 ${report.name ?: "-"}"
         holder.tvBloodGroup.text = "🩸 Blood Group: ${report.bloodGroup ?: "-"}"
         holder.tvWeight.text = "⚖️ Weight: ${report.weight ?: "-"}"
-
-        // 🔹 Last Donation ko bhi pretty format me dikhaya
-        holder.tvLastDonation.text =
-            "🗓️ Last Donation: ${formatDisplayDate(report.lastDonation)}"
-
+        holder.tvLastDonation.text = "🗓️ Last Donation: ${formatDisplayDate(report.lastDonation)}"
         holder.tvHemoglobin.text = "💉 Hemoglobin: ${report.hemoglobin ?: "-"}"
-
-        // 🔹 Eligibility + Next Eligible date handle
         setupEligibilityAndNextDate(holder, report.lastDonation)
     }
 
@@ -68,7 +62,6 @@ class ReportAdapter(
         }
 
         val lastDonationDate = parseFlexibleDate(lastDonationStr.trim())
-
         if (lastDonationDate == null) {
             holder.tvNextDonation.text = "📆 Next Eligible: -"
             holder.tvEligibility.text = "❓ Invalid date"
@@ -79,17 +72,11 @@ class ReportAdapter(
 
         val cal = Calendar.getInstance()
         cal.time = lastDonationDate
-
-        // 👉 Rule: 3 months ke baad eligible
         cal.add(Calendar.MONTH, 3)
         val nextEligibleDate = cal.time
-
         val today = Date()
         val isEligible = !nextEligibleDate.after(today)
-
-        // Next Eligible bhi same display format me
-        holder.tvNextDonation.text =
-            "📆 Next Eligible: ${displayFormat.format(nextEligibleDate)}"
+        holder.tvNextDonation.text = "📆 Next Eligible: ${displayFormat.format(nextEligibleDate)}"
 
         if (isEligible) {
             holder.tvEligibility.text = "✅ Eligible to Donate"
@@ -102,7 +89,6 @@ class ReportAdapter(
         }
     }
 
-    // 🔧 Firebase ke raw string (17/9/2025) ko Date me convert karega
     private fun parseFlexibleDate(dateStr: String): Date? {
         for (format in inputFormats) {
             try {
@@ -113,7 +99,6 @@ class ReportAdapter(
         return null
     }
 
-    // 🔧 Last Donation ko bhi Next Eligible jaisa format banane ke liye
     private fun formatDisplayDate(dateStr: String?): String {
         if (dateStr.isNullOrEmpty()) return "-"
 

@@ -26,8 +26,7 @@ class MessageListFragment : Fragment() {
     private lateinit var conversationsRef: DatabaseReference
     private lateinit var auth: FirebaseAuth
 
-    private val DATABASE_URL =
-        "YOUR DATABSE API"
+    private val DATABASE_URL = "YOUR DATABSE API"
 
     private val currentUserId: String
         get() = auth.currentUser?.uid ?: "anon"
@@ -60,14 +59,10 @@ class MessageListFragment : Fragment() {
     }
 
     private fun loadUsersWithChats() {
-
         usersRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(usersSnap: DataSnapshot) {
-
                 userList.clear()
-
                 for (u in usersSnap.children) {
-
                     val uid = u.key ?: continue
                     if (uid == currentUserId) continue
 
@@ -84,7 +79,6 @@ class MessageListFragment : Fragment() {
                     )
                 }
 
-                // STEP 2 — Load Chat History and Merge
                 conversationsRef.addListenerForSingleValueEvent(object : ValueEventListener {
                     override fun onDataChange(convSnap: DataSnapshot) {
 
@@ -100,7 +94,6 @@ class MessageListFragment : Fragment() {
                             }
                         }
 
-                        // STEP 3 — SORTING (chat users UP, normal DOWN)
                         userList.sortWith(
                             compareByDescending<MessageListModel> { it.lastTimestamp > 0 }
                                 .thenByDescending { it.lastTimestamp }
@@ -109,11 +102,9 @@ class MessageListFragment : Fragment() {
 
                         adapter.updateList(userList)
                     }
-
                     override fun onCancelled(error: DatabaseError) {}
                 })
             }
-
             override fun onCancelled(error: DatabaseError) {}
         })
     }

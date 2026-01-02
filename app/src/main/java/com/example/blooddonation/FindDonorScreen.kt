@@ -20,8 +20,8 @@ class FindDonorScreen : AppCompatActivity() {
     private lateinit var adapter: DonorAdapter
     private lateinit var edtSearch: EditText
 
-    private val donorList = ArrayList<DonorModel>()   // current shown
-    private val allDonors = ArrayList<DonorModel>()   // original list
+    private val donorList = ArrayList<DonorModel>()
+    private val allDonors = ArrayList<DonorModel>()
 
     private lateinit var database: FirebaseDatabase
     private lateinit var userRef: DatabaseReference
@@ -30,7 +30,6 @@ class FindDonorScreen : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_find_donor_screen)
 
-        // 🔙 Back button
         val backArrow: ImageView = findViewById(R.id.backArrow)
         backArrow.setOnClickListener {
             startActivity(Intent(this, HomeScreenActivity::class.java))
@@ -93,7 +92,6 @@ class FindDonorScreen : AppCompatActivity() {
                             val lastDonation = userSnap.child("lastDonation").value?.toString()
                             val profileImage = userSnap.child("profileImage").value?.toString()
 
-                            // ⭐ latitude
                             val latVal = userSnap.child("latitude").value
                             val latitude = when (latVal) {
                                 is Double -> latVal
@@ -102,7 +100,7 @@ class FindDonorScreen : AppCompatActivity() {
                                 else -> null
                             }
 
-                            // ⭐ longitude
+
                             val lonVal = userSnap.child("longitude").value
                             val longitude = when (lonVal) {
                                 is Double -> lonVal
@@ -111,7 +109,7 @@ class FindDonorScreen : AppCompatActivity() {
                                 else -> null
                             }
 
-                            // livesSaved
+
                             val lsRaw = userSnap.child("livesSaved").value
                             var livesSaved = when (lsRaw) {
                                 is Long -> lsRaw.toInt()
@@ -123,7 +121,7 @@ class FindDonorScreen : AppCompatActivity() {
                                 livesSaved = random.nextInt(5) + 1   // 1–5
                             }
 
-                            // totalDonations
+
                             val tdRaw = userSnap.child("totalDonations").value
                             var totalDonations = when (tdRaw) {
                                 is Long -> tdRaw.toInt()

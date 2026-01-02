@@ -122,7 +122,7 @@ class RequestActivity : AppCompatActivity() {
                 showToast("Failed to send request: ${it.message}")
             }
     }
-    
+
     private fun saveNotificationGlobal(title: String, message: String, ts: Long) {
         val notiRoot = database.getReference("notifications").child("all")
         val notiId = notiRoot.push().key ?: return

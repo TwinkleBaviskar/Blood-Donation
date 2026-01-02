@@ -20,13 +20,13 @@ class AuthActivity : AppCompatActivity() {
         authActivityBinding.btnclick1.setOnClickListener {
             val intent = Intent(this,LoginActivity::class.java)
             startActivity(intent)
-            finish() // Optional: prevent going back
+            finish()
         }
 
         authActivityBinding.btnclick2.setOnClickListener {
             val intent = Intent(this,RegistrationActivity::class.java)
             startActivity(intent)
-            finish() // Optional
+            finish()
         }
 
 

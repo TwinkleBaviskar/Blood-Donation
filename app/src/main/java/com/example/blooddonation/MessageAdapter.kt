@@ -33,13 +33,11 @@ class MessageAdapter(
         val m = list[pos]
 
         if (m.senderId == currentUid) {
-            // Sender
             h.tvSender.visibility = View.VISIBLE
             h.tvReceiver.visibility = View.GONE
             h.tvSender.text = m.text
 
         } else {
-            // Receiver
             h.tvSender.visibility = View.GONE
             h.tvReceiver.visibility = View.VISIBLE
             h.tvReceiver.text = m.text

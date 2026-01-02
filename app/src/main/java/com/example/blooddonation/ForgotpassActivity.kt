@@ -18,14 +18,12 @@ class ForgotpassActivity : AppCompatActivity() {
         binding = ActivityForgotpassBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Go back to LoginActivity when "Sign In" is clicked
         binding.txtSignIn.setOnClickListener {
             val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)
             finish()
         }
 
-        // Send Code button -> open OTP screen
         binding.root.findViewById<Button>(R.id.sendCodeButton)?.setOnClickListener {
             val intent = Intent(this, OtpScreenActivity::class.java)
             startActivity(intent)

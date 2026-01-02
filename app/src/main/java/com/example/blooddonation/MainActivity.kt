@@ -33,16 +33,13 @@ class MainActivity : AppCompatActivity() {
 
         when {
             currentUser != null -> {
-                // ✅ Already logged in → Go to Home
                 startActivity(Intent(this, HomeScreenActivity::class.java))
             }
             isFirstLaunch -> {
-                // 🆕 First time → Go to Intro
                 prefs.edit().putBoolean("isFirstLaunch", false).apply()
                 startActivity(Intent(this, IntroActivity1::class.java))
             }
             else -> {
-                // 🔁 Not logged in but already used app → Go to Auth screen
                 startActivity(Intent(this, AuthActivity::class.java))
             }
         }

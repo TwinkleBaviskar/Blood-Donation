@@ -21,7 +21,6 @@ class ProfileScreenActivity : AppCompatActivity() {
         binding = ActivityProfileScreenBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // 🔐 Firebase setup
         auth = FirebaseAuth.getInstance()
         database = FirebaseDatabase.getInstance("YOUR DATABASE API")
 
@@ -30,28 +29,23 @@ class ProfileScreenActivity : AppCompatActivity() {
             userRef = database.getReference("users").child(userId)
             loadUserProfile()
         } else {
-            // If user somehow not logged in → redirect to AuthActivity
             startActivity(Intent(this, AuthActivity::class.java))
             finish()
             return
         }
 
-        // 🩸 Edit Profile Button
         binding.btnEditProfile.setOnClickListener {
             startActivity(Intent(this, EditProfileActivity::class.java))
         }
 
-        // ⚙️ Settings Button
         binding.btnSettings.setOnClickListener {
             Toast.makeText(this, "Settings feature coming soon!", Toast.LENGTH_SHORT).show()
         }
 
-        // ℹ️ About App
         binding.btnAbout.setOnClickListener {
             Toast.makeText(this, "Blood Donation App v1.0\nDeveloped by Twinkle and Disha ❤️", Toast.LENGTH_LONG).show()
         }
 
-        // 🚪 Logout Button
         binding.btnLogout.setOnClickListener {
             auth.signOut()
             Toast.makeText(this, "Logged out successfully!", Toast.LENGTH_SHORT).show()
@@ -63,7 +57,6 @@ class ProfileScreenActivity : AppCompatActivity() {
     }
 
     private fun loadUserProfile() {
-        // 👤 Get user data once from Firebase
         userRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (snapshot.exists()) {
@@ -74,7 +67,6 @@ class ProfileScreenActivity : AppCompatActivity() {
                     binding.txtUserName.text = name
                     binding.txtLastDonation.text = "Last Donation: $lastDonation"
 
-                    // If imageUrl exists in DB, show it using Glide
                     if (!imageUrl.isNullOrEmpty()) {
                         Glide.with(this@ProfileScreenActivity)
                             .load(imageUrl)

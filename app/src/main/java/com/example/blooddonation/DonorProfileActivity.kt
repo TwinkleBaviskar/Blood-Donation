@@ -26,14 +26,12 @@ class DonorProfileActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_donor_profile)
 
-        // OSM config
         Configuration.getInstance().load(
             this,
             getSharedPreferences("osm_prefs", MODE_PRIVATE)
         )
         Configuration.getInstance().userAgentValue = packageName
 
-        // Views
         val backButton: ImageView = findViewById(R.id.backButton)
         val profileImage: ImageView = findViewById(R.id.profileImage)
         val profileName: TextView = findViewById(R.id.profileName)
@@ -49,10 +47,9 @@ class DonorProfileActivity : AppCompatActivity() {
         mapView.setMultiTouchControls(true)
         mapView.isTilesScaledToDpi = true
 
-        // Get donor data
+
         val donor = intent.getSerializableExtra("donorData") as DonorModel
 
-        // Data
         profileName.text = donor.fullName ?: "Unknown Donor"
         lastDonation.text = "Last Donation: ${donor.lastDonation ?: "-"}"
         bloodTypeValue.text = donor.bloodGroup ?: "-"
@@ -68,7 +65,6 @@ class DonorProfileActivity : AppCompatActivity() {
             profileImage.setImageResource(R.drawable.profile)
         }
 
-        // ⭐ SHOW DONOR LOCATION
         if (donor.latitude != null && donor.longitude != null) {
             showDonorLocation(donor.latitude, donor.longitude, donor.fullName ?: "")
         } else {
@@ -77,17 +73,15 @@ class DonorProfileActivity : AppCompatActivity() {
             showDonorLocation(20.5937, 78.9629, "Location not available")
         }
 
-        // Back
-        backButton.setOnClickListener { finish() }
 
-        // Call
+        backButton.setOnClickListener { finish() }
         callButton.setOnClickListener {
             donor.mobile?.let {
                 startActivity(Intent(Intent.ACTION_DIAL, Uri.parse("tel:$it")))
             } ?: Toast.makeText(this, "No phone number", Toast.LENGTH_SHORT).show()
         }
 
-        // Request
+
         requestButton.setOnClickListener {
             val intent = Intent(this, RequestActivity::class.java)
             intent.putExtra("donorId", donor.userId)
@@ -98,7 +92,7 @@ class DonorProfileActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        // Hide request/call for own profile
+
         if (donor.userId == FirebaseAuth.getInstance().currentUser?.uid) {
             callButton.visibility = View.GONE
             requestButton.visibility = View.GONE

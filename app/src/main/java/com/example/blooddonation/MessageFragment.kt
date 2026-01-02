@@ -23,9 +23,7 @@ class MessageFragment : Fragment() {
     private lateinit var edtMessage: EditText
     private lateinit var btnSend: ImageView
     private lateinit var txtHeader: TextView
-
     private val messageList = ArrayList<MessageModel>()
-
     private lateinit var db: FirebaseDatabase
     private lateinit var auth: FirebaseAuth
     private lateinit var msgRef: DatabaseReference
@@ -118,27 +116,20 @@ class MessageFragment : Fragment() {
     private fun updateConversations(text: String) {
 
         val time = System.currentTimeMillis()
-
-        // Sender side
         val senderMap = mapOf(
             "otherUserId" to otherUserId,
             "otherName" to otherName,
             "lastMessage" to text,
             "lastTimestamp" to time
         )
-
         convRef.child(currentUserId).child(otherUserId).setValue(senderMap)
-
-        // Receiver side
         val myName = auth.currentUser?.email?.substringBefore("@") ?: "User"
-
         val receiverMap = mapOf(
             "otherUserId" to currentUserId,
             "otherName" to myName,
             "lastMessage" to text,
             "lastTimestamp" to time
         )
-
         convRef.child(otherUserId).child(currentUserId).setValue(receiverMap)
     }
 
@@ -146,16 +137,13 @@ class MessageFragment : Fragment() {
         msgRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 messageList.clear()
-
                 for (m in snapshot.children) {
                     val message = m.getValue(MessageModel::class.java)
                     if (message != null) messageList.add(message)
                 }
-
                 adapter.notifyDataSetChanged()
                 recyclerView.scrollToPosition(messageList.size - 1)
             }
-
             override fun onCancelled(error: DatabaseError) {}
         })
     }

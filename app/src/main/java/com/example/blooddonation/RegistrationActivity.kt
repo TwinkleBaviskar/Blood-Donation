@@ -8,7 +8,6 @@ import android.text.Spanned
 import android.view.inputmethod.EditorInfo
 import android.widget.ArrayAdapter
 import android.widget.RadioButton
-import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -37,7 +36,6 @@ class RegistrationActivity : AppCompatActivity() {
         setupImeNavigation()
         setupInputFilters()
 
-        // Ensure dropDown width/offset set after layout
         binding.editBloodGroup.post {
             applyPopupInsetForField(binding.editBloodGroup, sideInsetDp = 16, maxHeightDp = 220)
         }
@@ -108,7 +106,6 @@ class RegistrationActivity : AppCompatActivity() {
                 field.dropDownWidth = android.view.ViewGroup.LayoutParams.WRAP_CONTENT
             }
         }
-        // set maximum popup height (keeps it from filling screen)
         field.dropDownHeight = maxHeightPx
         field.dropDownVerticalOffset = (6 * density).toInt()
     }
