@@ -40,10 +40,9 @@ class FindDonorScreen : AppCompatActivity() {
         recyclerView = findViewById(R.id.recyclerDonors)
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.setHasFixedSize(true)
+        edtSearch = findViewById(R.id.edtSearchDonor)
 
-        edtSearch = findViewById(R.id.edtSearchDonor)   // 👈 xml me ye id होना chahiye
-
-        database = FirebaseDatabase.getInstance("https://blooddonation-bbec8-default-rtdb.asia-southeast1.firebasedatabase.app/")
+        database = FirebaseDatabase.getInstance("YOUR DATABASE API")
         userRef = database.getReference("users")
 
         adapter = DonorAdapter(this, donorList)

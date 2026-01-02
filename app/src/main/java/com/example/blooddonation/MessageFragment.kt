@@ -35,7 +35,7 @@ class MessageFragment : Fragment() {
     private var otherName = ""
 
     private val DATABASE_URL =
-        "https://blooddonation-bbec8-default-rtdb.asia-southeast1.firebasedatabase.app"
+        "YOUR DATABASE API"
 
     private val currentUserId get() = auth.currentUser?.uid ?: ""
 

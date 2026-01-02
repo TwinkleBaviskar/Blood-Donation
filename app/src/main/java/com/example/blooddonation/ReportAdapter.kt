@@ -17,15 +17,11 @@ class ReportAdapter(
     private var reportList: ArrayList<ReportModel>
 ) : RecyclerView.Adapter<ReportAdapter.ReportViewHolder>() {
 
-    // Dono jagah (Last Donation + Next Eligible) me yehi format dikhayenge
-    // Example: 17 Sep 2025
     private val displayFormat = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
 
-    // Firebase me jo format stored hai:
-    // 17/9/2025  -> "d/M/yyyy"
     private val inputFormats = listOf(
-        SimpleDateFormat("d/M/yyyy", Locale.getDefault()),   // 17/9/2025
-        SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())  // 17/09/2025 (just in case)
+        SimpleDateFormat("d/M/yyyy", Locale.getDefault()),
+        SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
     )
 
     inner class ReportViewHolder(view: View) : RecyclerView.ViewHolder(view) {

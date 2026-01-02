@@ -85,9 +85,9 @@ class DonateFragment : Fragment() {
         recyclerView = view.findViewById(R.id.recyclerDonors)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
-        database = FirebaseDatabase.getInstance(
-            "https://blooddonation-bbec8-default-rtdb.asia-southeast1.firebasedatabase.app/"
+        database = FirebaseDatabase.getInstance("YOUR DATABASE API "
         )
+
         requestRef = database.getReference("requests")
 
         adapter = BloodDonorAdapter(requireContext(), listOf()) { donorModel ->

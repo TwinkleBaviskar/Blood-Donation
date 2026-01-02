@@ -9,7 +9,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.blooddonation.adapter.NotificationAdapter
 import com.example.blooddonation.databinding.FragmentNotificationBinding
 import com.example.blooddonation.model.NotificationModel
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 
 class NotificationFragment : Fragment() {
@@ -17,14 +16,14 @@ class NotificationFragment : Fragment() {
     private lateinit var binding: FragmentNotificationBinding
 
     private lateinit var db: FirebaseDatabase
-    private lateinit var auth: FirebaseAuth
     private lateinit var notiRef: DatabaseReference
 
     private val notificationList = ArrayList<NotificationModel>()
     private lateinit var adapter: NotificationAdapter
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentNotificationBinding.inflate(inflater, container, false)
@@ -34,16 +33,12 @@ class NotificationFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        auth = FirebaseAuth.getInstance()
-        val currentUser = auth.currentUser ?: return  // safety
-
-        db = FirebaseDatabase.getInstance(
-            "https://blooddonation-bbec8-default-rtdb.asia-southeast1.firebasedatabase.app/"
+        db = FirebaseDatabase.getInstance(" YOUR DATABASE API"
         )
-        notiRef = db.getReference("notifications").child(currentUser.uid)
+
+        notiRef = db.getReference("notifications").child("all")
 
         binding.recyclerNotifications.layoutManager = LinearLayoutManager(requireContext())
-
         adapter = NotificationAdapter(notificationList)
         binding.recyclerNotifications.adapter = adapter
 
@@ -71,7 +66,6 @@ class NotificationFragment : Fragment() {
             }
 
             override fun onCancelled(error: DatabaseError) {
-                // ignore for now
             }
         })
     }

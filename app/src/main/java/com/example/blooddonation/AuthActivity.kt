@@ -23,7 +23,6 @@ class AuthActivity : AppCompatActivity() {
             finish() // Optional: prevent going back
         }
 
-        // Handle arrow button click -> Go to next intro screen
         authActivityBinding.btnclick2.setOnClickListener {
             val intent = Intent(this,RegistrationActivity::class.java)
             startActivity(intent)

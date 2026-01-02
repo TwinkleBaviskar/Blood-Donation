@@ -1,9 +1,9 @@
 package com.example.blooddonation.model
 
 data class BloodDonorModel(
-    val userId: String = "",             // requester UID
-    val name: String = "",               // patient name (UI list)
-    val requesterName: String = "",      // 🔥 correct chat name
+    val userId: String = "",
+    val name: String = "",
+    val requesterName: String = "",
     val bloodGroup: String = "",
     val location: String = "",
     val timeAgo: String = "",

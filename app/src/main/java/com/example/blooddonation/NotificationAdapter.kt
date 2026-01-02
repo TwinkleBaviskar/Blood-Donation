@@ -11,8 +11,9 @@ import com.example.blooddonation.model.NotificationModel
 import java.text.SimpleDateFormat
 import java.util.*
 
-class NotificationAdapter(private val list: List<NotificationModel>)
-    : RecyclerView.Adapter<NotificationAdapter.NotiViewHolder>() {
+class NotificationAdapter(
+    private val list: List<NotificationModel>
+) : RecyclerView.Adapter<NotificationAdapter.NotiViewHolder>() {
 
     class NotiViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val icon: ImageView = itemView.findViewById(R.id.imgIcon)
@@ -37,6 +38,7 @@ class NotificationAdapter(private val list: List<NotificationModel>)
     override fun getItemCount(): Int = list.size
 
     private fun formatTime(ts: Long): String {
+        if (ts == 0L) return ""
         val sdf = SimpleDateFormat("hh:mm a", Locale.getDefault())
         return sdf.format(Date(ts))
     }

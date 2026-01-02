@@ -16,7 +16,6 @@ import java.util.concurrent.TimeUnit
 
 class DonorAdapter(
     private val context: Context,
-    // 🔁 pehle val tha, ab var kiya hai taa ki list update ho sake
     private var donorList: List<DonorModel>
 ) : RecyclerView.Adapter<DonorAdapter.DonorViewHolder>() {
 
@@ -42,7 +41,6 @@ class DonorAdapter(
         holder.donorLocation.text = donor.mobile ?: "No Contact"
         holder.donorBlood.text = donor.bloodGroup ?: "-"
         holder.donorLivesSaved.text = "Lives Saved: ${donor.livesSaved ?: 0}"
-
         holder.donorLastDonation.text = "Last Donation: ${calculateTimeAgo(donor.lastDonation)}"
 
         if (!donor.profileImage.isNullOrEmpty()) {
@@ -63,7 +61,6 @@ class DonorAdapter(
 
     override fun getItemCount(): Int = donorList.size
 
-    // ⭐ yeh naya function hai – search ke time pe list update karne ke liye
     fun updateList(newList: List<DonorModel>) {
         donorList = newList
         notifyDataSetChanged()

@@ -21,7 +21,7 @@ class RequestActivity : AppCompatActivity() {
     private lateinit var editMessage: EditText
     private lateinit var btnSendRequest: Button
 
-    // 🔥 Firebase
+    // Firebase
     private lateinit var auth: FirebaseAuth
     private lateinit var database: FirebaseDatabase
 
@@ -33,13 +33,10 @@ class RequestActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_request)
 
-        // 🩸 Firebase Init
-        database = FirebaseDatabase.getInstance(
-            "https://blooddonation-bbec8-default-rtdb.asia-southeast1.firebasedatabase.app/"
+        database = FirebaseDatabase.getInstance("YOUR DATABASE API"
         )
         auth = FirebaseAuth.getInstance()
 
-        // 🧩 Initialize all views
         editPatientName = findViewById(R.id.editPatientName)
         spinnerBloodGroup = findViewById(R.id.spinnerBloodGroup)
         radioGroupUrgency = findViewById(R.id.radioGroupUrgency)
@@ -48,11 +45,9 @@ class RequestActivity : AppCompatActivity() {
         editMessage = findViewById(R.id.editMessage)
         btnSendRequest = findViewById(R.id.btnSendRequest)
 
-        // 🔽 Setup BloodGroup Spinner
         val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, bloodGroups)
         spinnerBloodGroup.adapter = adapter
 
-        // 🚀 Send Request Button
         btnSendRequest.setOnClickListener {
             validateAndSend()
         }
@@ -96,14 +91,13 @@ class RequestActivity : AppCompatActivity() {
         val timestamp = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
             .format(Date(timestampLong))
 
-        // ✅ REQUESTER KA NAAM fetch karo
         val requesterName = getRequesterName()
 
         val requestMap = mapOf(
             "requestId" to requestId,
             "userId" to userId,
-            "patientName" to name,              // Patient ka naam
-            "requesterName" to requesterName,   // Request bhejne wale ka naam
+            "patientName" to name,
+            "requesterName" to requesterName,
             "bloodGroup" to group,
             "urgency" to urgency,
             "hospital" to hospital,
@@ -116,8 +110,7 @@ class RequestActivity : AppCompatActivity() {
 
         requestRef.setValue(requestMap)
             .addOnSuccessListener {
-                // ✅ sabhi dusre users ko notification bhejo
-                sendNotificationToAll(
+                saveNotificationGlobal(
                     title = "New Blood Request",
                     message = "$name needs $group blood at $hospital",
                     ts = timestampLong
@@ -129,58 +122,32 @@ class RequestActivity : AppCompatActivity() {
                 showToast("Failed to send request: ${it.message}")
             }
     }
+    
+    private fun saveNotificationGlobal(title: String, message: String, ts: Long) {
+        val notiRoot = database.getReference("notifications").child("all")
+        val notiId = notiRoot.push().key ?: return
 
-    // ✅ Sabhi users ko notification bhejne ka function
-    private fun sendNotificationToAll(title: String, message: String, ts: Long) {
-        val usersRef = database.getReference("users")
-        val notiRoot = database.getReference("notifications")
+        val noti = NotificationModel(
+            notificationId = notiId,
+            title = title,
+            message = message,
+            timestamp = ts
+        )
 
-        val currentUid = auth.currentUser?.uid ?: return
-
-        usersRef.get().addOnSuccessListener { snapshot ->
-            for (userSnap in snapshot.children) {
-                val uid = userSnap.child("userId").getValue(String::class.java)
-                    ?: userSnap.key ?: continue
-
-                // Apne aap ko skip karo
-                if (uid == currentUid) continue
-
-                val notiId = notiRoot.push().key ?: continue
-
-                val noti = NotificationModel(
-                    notificationId = notiId,
-                    title = title,
-                    message = message,
-                    timestamp = ts
-                )
-
-                notiRoot.child(uid).child(notiId).setValue(noti)
-            }
-        }
+        notiRoot.child(notiId).setValue(noti)
     }
 
-    // ✅ Current logged-in user ka naam nikalo
     private fun getRequesterName(): String {
-        // Option 1: Firebase Auth se display name
         val displayName = auth.currentUser?.displayName
-        if (!displayName.isNullOrBlank()) {
-            return displayName
-        }
+        if (!displayName.isNullOrBlank()) return displayName
 
-        // Option 2: SharedPreferences se (agar signup time save kiya ho)
         val prefs = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
         val savedName = prefs.getString("user_name", null)
-        if (!savedName.isNullOrBlank()) {
-            return savedName
-        }
+        if (!savedName.isNullOrBlank()) return savedName
 
-        // Option 3: Email se naam banao (last option)
         val email = auth.currentUser?.email
-        if (!email.isNullOrBlank()) {
-            return email.substringBefore("@")
-        }
+        if (!email.isNullOrBlank()) return email.substringBefore("@")
 
-        // Default fallback
         return "Anonymous User"
     }
 

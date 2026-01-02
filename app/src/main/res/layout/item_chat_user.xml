@@ -5,6 +5,7 @@
     android:orientation="horizontal"
     android:padding="10dp"
     android:gravity="center_vertical"
+    android:fitsSystemWindows="true"
     android:background="?attr/selectableItemBackground">
 
     <!-- 🟢 Profile Image -->

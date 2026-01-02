@@ -27,7 +27,7 @@ class MessageListFragment : Fragment() {
     private lateinit var auth: FirebaseAuth
 
     private val DATABASE_URL =
-        "https://blooddonation-bbec8-default-rtdb.asia-southeast1.firebasedatabase.app"
+        "YOUR DATABSE API"
 
     private val currentUserId: String
         get() = auth.currentUser?.uid ?: "anon"

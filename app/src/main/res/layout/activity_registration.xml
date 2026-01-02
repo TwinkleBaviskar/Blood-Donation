@@ -44,7 +44,8 @@
        android:background="@drawable/edttext_border_black"
        android:layout_marginTop="40dp"
        android:layout_marginHorizontal="30dp"
-       android:imeOptions="actionNext" />
+       android:imeOptions="actionNext"
+       android:inputType="textPersonName" />
 
    <!-- Mobile -->
    <EditText
@@ -93,6 +94,7 @@
        android:layout_height="wrap_content"
        android:hint="Age"
        android:inputType="number"
+       android:maxLength="3"
        android:padding="12dp"
        android:background="@drawable/edttext_border_black"
        android:layout_marginTop="18dp"
@@ -128,8 +130,7 @@
          android:layout_width="wrap_content"
          android:layout_height="wrap_content"
          android:text="Male"
-         android:textColor="@color/black"
-         android:paddingEnd="20dp" />
+         android:textColor="@color/black" />
 
      <RadioButton
          android:id="@+id/radioFemale"
@@ -140,17 +141,25 @@
     </RadioGroup>
    </LinearLayout>
 
-   <!-- Blood Group -->
-   <EditText
+   <!-- Blood Group (AutoCompleteTextView) -->
+   <AutoCompleteTextView
        android:id="@+id/editBloodGroup"
        android:layout_width="match_parent"
        android:layout_height="wrap_content"
-       android:hint="Blood Group (e.g. A+, O-)"
+       android:hint="Blood Group (A+, O-...)"
        android:padding="12dp"
        android:background="@drawable/edttext_border_black"
        android:layout_marginTop="18dp"
        android:layout_marginHorizontal="30dp"
-       android:imeOptions="actionNext" />
+       android:imeOptions="actionNext"
+       android:inputType="text"
+       android:dropDownHeight="220dp"
+       android:dropDownVerticalOffset="6dp"
+       android:dropDownWidth="match_parent"
+       android:popupElevation="8dp"
+       android:dropDownAnchor="@id/editBloodGroup"
+       android:completionThreshold="1"
+       android:popupBackground="@drawable/auto_complete_popup_bg" />
 
    <!-- Weight -->
    <EditText
@@ -159,24 +168,33 @@
        android:layout_height="wrap_content"
        android:hint="Weight (kg)"
        android:inputType="numberDecimal"
+       android:maxLength="5"
        android:padding="12dp"
        android:background="@drawable/edttext_border_black"
        android:layout_marginTop="18dp"
        android:layout_marginHorizontal="30dp"
        android:imeOptions="actionNext" />
 
-   <!-- Hemoglobin -->
-   <EditText
+   <!-- Hemoglobin (AutoCompleteTextView) -->
+   <AutoCompleteTextView
        android:id="@+id/editHemoglobin"
        android:layout_width="match_parent"
        android:layout_height="wrap_content"
        android:hint="Hemoglobin (g/dL)"
        android:inputType="numberDecimal"
+       android:maxLength="5"
        android:padding="12dp"
        android:background="@drawable/edttext_border_black"
        android:layout_marginTop="18dp"
        android:layout_marginHorizontal="30dp"
-       android:imeOptions="actionNext" />
+       android:imeOptions="actionNext"
+       android:dropDownHeight="200dp"
+       android:dropDownVerticalOffset="6dp"
+       android:dropDownWidth="match_parent"
+       android:popupElevation="8dp"
+       android:dropDownAnchor="@id/editHemoglobin"
+       android:completionThreshold="1"
+       android:popupBackground="@drawable/auto_complete_popup_bg" />
 
    <!-- Last Donation -->
    <EditText
@@ -244,4 +262,5 @@
       android:textColor="#E91E63"
       android:layout_marginStart="4dp" />
  </LinearLayout>
+
 </LinearLayout>

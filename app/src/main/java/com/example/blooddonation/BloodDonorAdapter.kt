@@ -46,12 +46,10 @@ class BloodDonorAdapter(
         holder.location.text = donor.location
         holder.timeAgo.text = donor.timeAgo
 
-        // Urgent = light-red background
         holder.card.setCardBackgroundColor(
             if (donor.isUrgent) Color.parseColor("#FFF1F1") else Color.WHITE
         )
 
-        // ⏰ 12 hours expiry check
         val now = System.currentTimeMillis()
         val isExpired = donor.timestamp <= 0L ||
                 (now - donor.timestamp) > TimeUnit.HOURS.toMillis(12)
@@ -95,14 +93,12 @@ class BloodDonorAdapter(
         notifyDataSetChanged()
     }
 
-    // ================== DIALOG ==================
 
     private fun showContactDialog(donor: BloodDonorModel) {
         val builder = AlertDialog.Builder(context)
         builder.setTitle("Contact ${donor.name}")
         builder.setMessage("Choose how you want to contact:")
 
-        // LEFT: CALL  -> NEUTRAL
         builder.setNeutralButton("CALL") { _, _ ->
             val phone = donor.phone
             if (phone.isNotBlank()) {
@@ -115,7 +111,6 @@ class BloodDonorAdapter(
             }
         }
 
-        // RIGHT: CANCEL -> POSITIVE
         builder.setPositiveButton("CANCEL") { dialog, _ ->
             dialog.dismiss()
         }

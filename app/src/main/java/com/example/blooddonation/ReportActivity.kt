@@ -19,10 +19,7 @@ class ReportActivity : AppCompatActivity() {
     private var allReports: ArrayList<ReportModel> = ArrayList()
 
     private lateinit var dbRef: DatabaseReference
-
-    // 🔗 tumhara REAL database URL (logcat ne jo diya)
-    private val DATABASE_URL =
-        "https://blooddonation-bbec8-default-rtdb.asia-southeast1.firebasedatabase.app"
+    private val DATABASE_URL ="YOUR DATABASE API"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,13 +27,10 @@ class ReportActivity : AppCompatActivity() {
 
         val etSearch = findViewById<EditText>(R.id.etSearch)
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerReports)
-
-        // ✅ IMPORTANT: yahan URL ke sath instance lo
         val db = FirebaseDatabase.getInstance(DATABASE_URL)
 
-        // yahan EXACT node ka naam use karo: "users" ya "Users"
-        dbRef = db.getReference("users")
 
+        dbRef = db.getReference("users")
         adapter = ReportAdapter(reportList)
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = adapter

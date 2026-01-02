@@ -45,7 +45,7 @@ class EditProfileActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         auth = FirebaseAuth.getInstance()
-        database = FirebaseDatabase.getInstance("https://blooddonation-bbec8-default-rtdb.asia-southeast1.firebasedatabase.app/")
+        database = FirebaseDatabase.getInstance("YOUR DATABASE API")
 
         loadUserData()
 

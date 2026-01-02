@@ -23,7 +23,7 @@ class ProfileScreenActivity : AppCompatActivity() {
 
         // 🔐 Firebase setup
         auth = FirebaseAuth.getInstance()
-        database = FirebaseDatabase.getInstance("https://blooddonation-bbec8-default-rtdb.asia-southeast1.firebasedatabase.app/")
+        database = FirebaseDatabase.getInstance("YOUR DATABASE API")
 
         val userId = auth.currentUser?.uid
         if (userId != null) {
@@ -48,7 +48,7 @@ class ProfileScreenActivity : AppCompatActivity() {
 
         // ℹ️ About App
         binding.btnAbout.setOnClickListener {
-            Toast.makeText(this, "Blood Donation App v1.0\nDeveloped by Twinkle ❤️", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "Blood Donation App v1.0\nDeveloped by Twinkle and Disha ❤️", Toast.LENGTH_LONG).show()
         }
 
         // 🚪 Logout Button
