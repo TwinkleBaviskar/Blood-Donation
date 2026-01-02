@@ -44,7 +44,17 @@ Reduce response time in blood emergencies Create a centralized donor database En
 
     git clone https://github.com/your-username/blood-donation-app.git 
     
-Open Project in Android Studio Firebase Setup Create a project in Firebase Console Enable Authentication Enable Realtime Database Download google-services.json Place it inside the app/ directory Sync Gradle Files Run the App Connect device/emulator Click Run ▶️
+Open Project in Android Studio 
+
+Firebase Setup Create a project in Firebase Console 
+
+Enable Authentication 
+
+Enable Realtime Database 
+
+Download google-services.json Place it inside the app/ directory Sync Gradle Files Run the App Connect device/emulator 
+
+Click Run ▶️
 
 🔄 **Application Workflow**
 
